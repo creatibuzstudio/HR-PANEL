@@ -29,9 +29,9 @@ const PasswordField = ({
           type={isPassword && !showPassword ? "password" : "text"}
           placeholder={placeholder}
           {...register(name, validation)}
-          className={`border-[1px] border-[#E4E4E7] dark:border-white/10 py-2 sm:py-2.5 pr-8 sm:pr-10 bg-white w-full outline-none focus:border-green-300/50 dark:focus:border-primary dark:text-white/90 text-sm sm:text-base rounded-md ${
+          className={`border-[1px] border-[#E4E4E7] dark:border-white/10 py-2 sm:py-2.5 pr-8 sm:pr-10 bg-white dark:bg-gray-800 w-full outline-none transition-all duration-200 hover:border-primary/60 dark:hover:border-primary/60 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:border-primary dark:text-white/90 text-sm sm:text-base rounded-md ${
             icon ? "pl-10 sm:pl-11" : "pl-3 sm:pl-4"
-          } password-input ${error ? "border-red-500" : ""}`}
+          } password-input ${error ? "border-red-500 focus:border-red-500 focus:ring-red-200" : ""}`}
           {...props}
         />
         {icon && (

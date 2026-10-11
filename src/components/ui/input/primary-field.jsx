@@ -72,8 +72,8 @@ const PrimaryField = ({
           placeholder={placeholder}
           name={name}
           type={type}
-          className={`py-2 sm:py-2.5 px-3 sm:px-4 text-gray-500 mt-1 sm:mt-2 bg-white/30 w-full outline-none border text-sm sm:text-base rounded-md ${
-            error ? "border-red-500" : "border-gray-300"
+          className={`py-2 sm:py-2.5 px-3 sm:px-4 text-gray-700 dark:text-gray-200 mt-1 sm:mt-2 bg-white/30 w-full outline-none border transition-all duration-200 hover:border-primary/60 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm sm:text-base rounded-md ${
+            error ? "border-red-500" : "border-gray-300 dark:border-gray-600"
           } ${className}`}
           {...register(name)}
           {...props}

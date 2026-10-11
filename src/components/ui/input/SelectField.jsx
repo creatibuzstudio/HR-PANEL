@@ -25,8 +25,8 @@ const SelectField = ({
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className={`border-[1px] border-[#E4E4E7] dark:border-white/10 py-2.5 px-4 rounded-[6px] bg-white w-full outline-none focus:border-green-300/50 dark:focus:border-primary dark:text-white/90 ${
-          error ? "border-red-500" : ""
+        className={`border-[1px] border-[#E4E4E7] dark:border-white/10 py-2.5 px-4 rounded-[6px] bg-white dark:bg-gray-800 w-full outline-none transition-all duration-200 hover:border-primary/60 dark:hover:border-primary/60 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:border-primary dark:text-white/90 ${
+          error ? "border-red-500 focus:border-red-500 focus:ring-red-200" : ""
         } ${disabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
         {...props}
       >

@@ -25,9 +25,9 @@ const TextareaField = ({
         rows={rows}
         placeholder={placeholder}
         {...register(name)}
-        className={`border-[1px] border-[#E4E4E7] dark:border-white/10 py-2.5 px-4 rounded-[6px] bg-white w-full outline-none focus:border-green-300/50 dark:focus:border-primary dark:text-white/90 resize-vertical min-h-[80px] ${
+        className={`border-[1px] border-[#E4E4E7] dark:border-white/10 py-2.5 px-4 rounded-[6px] bg-white dark:bg-gray-800 w-full outline-none transition-all duration-200 hover:border-primary/60 dark:hover:border-primary/60 focus:border-primary focus:ring-2 focus:ring-primary/20 dark:focus:border-primary dark:text-white/90 resize-vertical min-h-[80px] ${
           disabled && "bg-gray-400"
-        } ${error ? "border-red-500" : ""}`}
+        } ${error ? "border-red-500 focus:border-red-500 focus:ring-red-200" : ""}`}
       />
       {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
     </div>
