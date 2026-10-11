@@ -190,7 +190,7 @@ const ImageInput = ({
           ref={dropZoneRef}
           className={`relative border-2 border-dashed rounded-lg p-6 transition-all duration-200 cursor-pointer ${
             dragActive
-              ? "border-blue-400 bg-blue-50 dark:bg-blue-900/20 scale-105"
+              ? "border-primary bg-orange-50 dark:bg-orange-950/20 scale-105"
               : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
           } ${hasImage ? "bg-gray-50 dark:bg-gray-800/50" : ""}`}
           onDragEnter={handleDrag}
@@ -248,7 +248,7 @@ const ImageInput = ({
                     </div>
                   )}
                   {!file && (currentImage || value) && (
-                    <div className="absolute -top-2 -right-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">
+                    <div className="absolute -top-2 -right-2 bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full font-medium">
                       Current
                     </div>
                   )}
@@ -272,7 +272,7 @@ const ImageInput = ({
                 <div className="space-y-2">
                   <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
                     Drag and drop or{" "}
-                    <span className="text-blue-600 dark:text-blue-400 underline">
+                    <span className="text-primary dark:text-primary underline">
                       browse
                     </span>{" "}
                     to upload
@@ -288,7 +288,7 @@ const ImageInput = ({
           {/* Loading overlay */}
           {isLoading && (
             <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 rounded-lg flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           )}
         </div>

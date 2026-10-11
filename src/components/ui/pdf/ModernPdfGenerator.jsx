@@ -27,9 +27,9 @@ const ModernPdfGenerator = ({
 
     // Modern Color Palette
     const colors = {
-      primary: "#1a1a1a",
-      secondary: "#f3f4f6",
-      accent: "#2563eb",
+      primary: "#180d05",
+      secondary: "#fff7ed",
+      accent: "#f9570c",
       text: "#374151",
       lightText: "#6b7280",
       white: "#ffffff",

@@ -38,16 +38,16 @@ const buttonVariants = cva("border font-medium rounded-full select-none tr", {
   variants: {
     variant: {
       default:
-        "border-secondary text-white dark:text-black dark:hover:text-white bg-secondary hover:bg-primary hover:border-primary",
+        "border-primary text-white bg-primary hover:bg-orange-600 hover:border-orange-600 shadow-sm transition-all",
       secondary:
-        "border-secondary text-secondary bg-transparent hover:bg-primary hover:border-primary hover:text-white",
+        "border-orange-500/30 text-primary bg-orange-500/10 hover:bg-primary hover:border-primary hover:text-white transition-all",
       primary:
-        "border-primary text-white bg-primary hover:bg-red-600 hover:border-red-600",
+        "border-primary text-white bg-primary hover:bg-orange-600 hover:border-orange-600 shadow-sm transition-all",
       accent:
-        "bg-white text-primary hover:bg-primary hover:border-primary dark:border-none hover:text-white dark:hover:text-primary",
-      rubix: "bg-red-500/20 text-primary hover:bg-primary hover:text-white",
+        "bg-white text-primary hover:bg-primary hover:border-primary dark:border-none hover:text-white dark:hover:text-primary transition-all",
+      rubix: "bg-orange-500/20 text-primary hover:bg-primary hover:text-white transition-all",
       outline:
-        "border-primary text-primary bg-transparent hover:bg-red-500/10 tr",
+        "border-primary text-primary bg-transparent hover:bg-orange-500/10 tr transition-all",
     },
     size: {
       default: "py-3 px-4",

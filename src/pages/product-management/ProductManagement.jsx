@@ -105,7 +105,7 @@ export default function ProductManagement() {
       </span>
     ),
     purchase_type: (
-      <span className="capitalize whitespace-nowrap px-2 py-1 rounded bg-blue-50 text-blue-700 text-xs">
+      <span className="capitalize whitespace-nowrap px-2 py-1 rounded bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300 text-xs font-medium">
         {product.purchase_type?.replace(/_/g, " ")}
       </span>
     ),

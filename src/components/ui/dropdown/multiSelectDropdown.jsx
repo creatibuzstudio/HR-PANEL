@@ -77,7 +77,7 @@ export default function MultiSelectDropdown({
               {selectedOptions.map((opt) => (
                 <span
                   key={opt.value}
-                  className={`bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded flex items-center gap-1 ${chipsSizeClasses[size]}`}
+                  className={`bg-orange-100 dark:bg-orange-950/40 text-orange-800 dark:text-orange-200 font-medium rounded flex items-center gap-1 ${chipsSizeClasses[size]}`}
                 >
                   {opt.label}
                   <X

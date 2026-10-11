@@ -184,7 +184,7 @@ export default function ReusableTable({
               placeholder={searchPlaceholder}
               value={localSearchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:text-white"
             />
           </div>
         )}
@@ -234,9 +234,9 @@ export default function ReusableTable({
 
       {/* Bulk Actions */}
       {enableBulkActions && selectedRows.size > 0 && (
-        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <div className="mb-4 p-3 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800/50 rounded-lg">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-blue-700 dark:text-blue-300">
+            <span className="text-sm font-medium text-orange-800 dark:text-orange-300">
               {selectedRows.size} item(s) selected
             </span>
             <div className="flex items-center gap-2">
@@ -268,7 +268,7 @@ export default function ReusableTable({
                     type="checkbox"
                     checked={selectAll}
                     onChange={handleSelectAll}
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    className="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 accent-orange-600"
                   />
                 </TableHead>
               )}
@@ -321,7 +321,7 @@ export default function ReusableTable({
                     key={index}
                     className={`border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors duration-200 ${
                       selectedRows.has(item.id)
-                        ? "bg-blue-50 dark:bg-blue-900/20"
+                        ? "bg-orange-50/70 dark:bg-orange-950/20"
                         : ""
                     }`}
                   >
@@ -331,7 +331,7 @@ export default function ReusableTable({
                           type="checkbox"
                           checked={selectedRows.has(item.id)}
                           onChange={() => handleRowSelect(item.id)}
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                          className="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 accent-orange-600"
                         />
                       </TableCell>
                     )}

@@ -59,17 +59,35 @@ const AdminSidebar = () => {
       }`}
     >
       {/* Header */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700">
-        {!collapsed && (
-          <div className="flex items-center">
-            <div className="w-36 h-full rounded flex items-center justify-center">
-              <img className="w-full h-full " src={logo} alt="logo" />
+      <div className="h-16 flex items-center justify-between px-3.5 border-b border-gray-200 dark:border-gray-700">
+        {!collapsed ? (
+          <div className="flex items-center gap-2.5 overflow-hidden">
+            <img
+              className="w-9 h-9 rounded-xl shadow-sm object-cover flex-shrink-0"
+              src={logo}
+              alt="Creatibuz Studio"
+            />
+            <div className="flex flex-col min-w-0">
+              <span className="font-bold text-sm tracking-tight text-gray-900 dark:text-white truncate">
+                Creatibuz Studio
+              </span>
+              <span className="text-[10px] font-semibold text-primary uppercase tracking-wider">
+                HR Panel
+              </span>
             </div>
+          </div>
+        ) : (
+          <div className="mx-auto">
+            <img
+              className="w-8 h-8 rounded-lg shadow-sm object-cover"
+              src={logo}
+              alt="Creatibuz Studio"
+            />
           </div>
         )}
         <button
           onClick={toggleCollapse}
-          className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
         >
           {collapsed ? (
             <ChevronRight className="w-4 h-4" />
@@ -81,16 +99,16 @@ const AdminSidebar = () => {
 
       {/* Navigation */}
       <nav className="mt-4 px-2">
-        <ul className="space-y-3">
+        <ul className="space-y-2">
           {visibleNavLinks.map((item, i) => (
             <li key={i}>
               <div>
                 <Link
                   to={item.link}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     isParentActive(item.link)
-                      ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      ? "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary font-semibold"
+                      : "text-gray-700 dark:text-gray-300 hover:bg-primary/5 dark:hover:bg-primary/10 hover:text-primary dark:hover:text-primary"
                   }`}
                   onClick={() => {
                     if (item.children && item.children.length > 0)
@@ -127,8 +145,8 @@ const AdminSidebar = () => {
                           to={child.link}
                           className={`block px-3 py-2 rounded-md text-sm transition-colors ${
                             isActive(child.link)
-                              ? "bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400"
-                              : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                              ? "bg-primary/15 text-primary font-semibold dark:bg-primary/25 dark:text-primary"
+                              : "text-gray-600 dark:text-gray-400 hover:bg-primary/5 dark:hover:bg-gray-700 hover:text-primary"
                           }`}
                         >
                           {child.title}

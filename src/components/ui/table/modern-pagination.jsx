@@ -51,7 +51,7 @@ const ModernPagination = ({
           <select
             value={localItemsPerPage}
             onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-            className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           >
             {itemsPerPageOptions.map((option) => (
               <option key={option} value={option}>
@@ -71,7 +71,7 @@ const ModernPagination = ({
         <button
           onClick={() => handlePageChange(1)}
           disabled={currentPage === 1}
-          className="flex items-center justify-center w-8 h-8 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center justify-center w-8 h-8 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           title="Go to first page"
         >
           <ChevronsLeft className="w-4 h-4" />
@@ -81,7 +81,7 @@ const ModernPagination = ({
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="flex items-center gap-1 px-3 py-1 text-sm text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center gap-1 px-3 py-1 text-sm text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           title="Previous page"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -115,7 +115,7 @@ const ModernPagination = ({
                 }
               }
             }}
-            className="w-14 h-8 px-2 text-center text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-14 h-8 px-2 text-center text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           />
           <span className="text-sm text-gray-700 dark:text-gray-300">
             of {totalPages}
@@ -126,7 +126,7 @@ const ModernPagination = ({
         <button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="flex items-center gap-1 px-3 py-1 text-sm text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center gap-1 px-3 py-1 text-sm text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           title="Next page"
         >
           Next
@@ -137,7 +137,7 @@ const ModernPagination = ({
         <button
           onClick={() => handlePageChange(totalPages)}
           disabled={currentPage === totalPages}
-          className="flex items-center justify-center w-8 h-8 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center justify-center w-8 h-8 text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           title="Go to last page"
         >
           <ChevronsRight className="w-4 h-4" />

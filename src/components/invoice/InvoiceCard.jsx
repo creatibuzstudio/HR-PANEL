@@ -299,12 +299,12 @@ export default function InvoiceCard({ invoice }) {
               {(invoice?.metadata?.division_name ||
                 invoice?.metadata?.division_Name ||
                 invoice?.metadata?.district_name) && (
-                <div className="mb-6 mt-2 rounded-xl border-2 border-blue-200 bg-blue-50/70 px-4 py-3 shadow-sm">
+                <div className="mb-6 mt-2 rounded-xl border-2 border-orange-200 bg-orange-50/70 dark:bg-orange-950/20 dark:border-orange-900/40 px-4 py-3 shadow-sm">
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Division */}
                     {(invoice?.metadata?.division_name ||
                       invoice?.metadata?.division_Name) && (
-                      <span className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-blue-700 border border-blue-300 shadow-xs">
+                      <span className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-orange-700 dark:text-orange-300 border border-orange-300 dark:border-orange-800 shadow-xs">
                         Division:&nbsp;
                         <span className="uppercase tracking-wide">
                           {invoice?.metadata?.division_name ||

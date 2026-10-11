@@ -196,7 +196,7 @@ export default function RolePermissionManagement() {
         icon={Edit}
         onClick={() => openPermissionModal(role)}
         title="Edit Permissions"
-        className="text-blue-600 hover:text-blue-700"
+        className="text-primary hover:text-orange-600"
       />
     ),
   }));

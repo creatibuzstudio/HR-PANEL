@@ -88,13 +88,21 @@ const AdminLogin = () => {
     <div className="min-h-screen dark:bg-gray-900 bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
-        <div className="text-center">
-          <div className="mx-auto w-full  rounded-full flex items-center justify-center mb-4">
-            <img src={logo} alt="logo" className="w-[200px] text-white" />
+        <div className="text-center flex flex-col items-center">
+          <div className="relative mb-3 group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-orange-600 to-amber-500 rounded-3xl blur opacity-35 group-hover:opacity-60 transition duration-500"></div>
+            <img
+              src={logo}
+              alt="Creatibuz Studio"
+              className="relative w-20 h-20 rounded-2xl shadow-xl object-cover ring-2 ring-orange-500/30"
+            />
           </div>
-          {/* <h2 className="text-3xl font-bold dark:text-white/75 text-gray-900 mb-2">
-                        Creatibuz Studio
-                    </h2> */}
+          <h2 className="text-2xl font-bold dark:text-white text-gray-900 tracking-tight">
+            Creatibuz Studio
+          </h2>
+          <p className="text-xs font-semibold text-primary uppercase tracking-wider mt-1">
+            HR Management Portal
+          </p>
         </div>
 
         {/* Login Form */}
@@ -170,7 +178,7 @@ const AdminLogin = () => {
                     loginMode === "magic-link" ? "password" : "magic-link",
                   )
                 }
-                className="text-sm text-blue-600 hover:text-blue-500 hover:underline dark:text-blue-400"
+                className="text-sm text-primary hover:text-orange-600 hover:underline dark:text-primary transition-colors"
               >
                 {loginMode === "magic-link"
                   ? "Login with Password"

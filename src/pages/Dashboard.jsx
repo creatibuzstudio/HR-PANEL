@@ -24,7 +24,7 @@ const Dashboard = () => {
       change: `${data?.customersChange ?? 0}%`,
       changeType: data?.customersChange >= 0 ? "positive" : "negative",
       icon: Users,
-      color: "bg-blue-500",
+      color: "bg-gradient-to-r from-orange-500 to-amber-500",
     },
     {
       title: "Weather Stations",
@@ -90,7 +90,7 @@ const Dashboard = () => {
       case "warning":
         return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
       case "info":
-        return <Clock className="w-4 h-4 text-blue-500" />;
+        return <Clock className="w-4 h-4 text-primary" />;
       default:
         return <Activity className="w-4 h-4 text-gray-500" />;
     }
@@ -188,7 +188,7 @@ const Dashboard = () => {
             <button className="w-full text-left p-3 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
               <Link to={"/registration-requests"}>
                 <div className="flex items-center space-x-3">
-                  <Users className="w-5 h-5 text-blue-500" />
+                  <Users className="w-5 h-5 text-primary" />
                   <span className="text-sm font-medium text-gray-900 dark:text-white">
                     Manage Customer
                   </span>

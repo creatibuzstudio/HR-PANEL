@@ -26,7 +26,7 @@ const FilterControls = ({ filtersConfig, filters, setFilters }) => {
             name={filter.label}
             options={filter.options}
             setSelectedOption={(value) => handleFilterChange(filter.key, value)}
-            className="border-blue-100 bg-bg50 py-2"
+            className="border-orange-100 dark:border-white/20 bg-bg50 py-2"
           >
             {filters[filter.key]?.label || (
               <span className="text-black/50 dark:text-white/50">
