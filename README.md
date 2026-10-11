@@ -1,4 +1,4 @@
-# Frontend
+# Creatibuz Studio - HR Panel
 
 ---
 

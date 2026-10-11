@@ -23,9 +23,9 @@ export const getTokens = () => {
     };
   } else {
     // If local storage tokens are not valid or not present, check sessionStorage for session-only tokens
-    const sessionAccessToken = sessionStorage.getItem("celestial_access");
-    const sessionRefreshToken = sessionStorage.getItem("celestial_refresh");
-    const sessionUser = sessionStorage.getItem("celestial_user");
+    const sessionAccessToken = sessionStorage.getItem("creatibuz_studio_access");
+    const sessionRefreshToken = sessionStorage.getItem("creatibuz_studio_refresh");
+    const sessionUser = sessionStorage.getItem("creatibuz_studio_user");
 
     // For sessionStorage, we assume they are valid for the current session until explicitly cleared
     // or the session ends (browser tab closed). No explicit 'exp' check here,
@@ -42,9 +42,9 @@ export const getTokens = () => {
 // Function to clear all authentication tokens from both sessionStorage and localStorage
 export const clearTokens = () => {
   // Clear from sessionStorage
-  sessionStorage.removeItem("celestial_access");
-  sessionStorage.removeItem("celestial_refresh");
-  sessionStorage.removeItem("celestial_user");
+  sessionStorage.removeItem("creatibuz_studio_access");
+  sessionStorage.removeItem("creatibuz_studio_refresh");
+  sessionStorage.removeItem("creatibuz_studio_user");
 
   // Clear from localStorage (for "remember me" data)
   removeAuthLocalStorage();
@@ -52,10 +52,10 @@ export const clearTokens = () => {
 
 // Function to set authentication tokens specifically for the current session (not "remember me")
 export const setSessionToken = (accessToken, refreshToken, user) => {
-  sessionStorage.setItem("celestial_access", accessToken);
-  sessionStorage.setItem("celestial_refresh", refreshToken);
+  sessionStorage.setItem("creatibuz_studio_access", accessToken);
+  sessionStorage.setItem("creatibuz_studio_refresh", refreshToken);
   // Optionally, you can also store user data in sessionStorage
-  sessionStorage.setItem("celestial_user", JSON.stringify(user));
+  sessionStorage.setItem("creatibuz_studio_user", JSON.stringify(user));
 
   // When setting session tokens, ensure any "remember me" tokens are cleared
   // to avoid confusion or unintended persistent login.
@@ -67,7 +67,7 @@ export const setRememberMeTokens = (accessToken, refreshToken, user) => {
   // Use the localStorage setter to store tokens persistently
   setAuthLocalStorage({ accessToken, refreshToken, user });
   // Also, clear session storage in case it had temporary tokens
-  sessionStorage.removeItem("celestial_access");
-  sessionStorage.removeItem("celestial_refresh");
-  sessionStorage.removeItem("celestial_user");
+  sessionStorage.removeItem("creatibuz_studio_access");
+  sessionStorage.removeItem("creatibuz_studio_refresh");
+  sessionStorage.removeItem("creatibuz_studio_user");
 };

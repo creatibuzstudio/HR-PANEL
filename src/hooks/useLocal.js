@@ -2,7 +2,7 @@
 
 import { decodeJWT } from "@/lib/jwt-decoder";
 
-export const setAuthLocalStorage = (auth, name = "celestial") => {
+export const setAuthLocalStorage = (auth, name = "creatibuz_studio") => {
   const { accessToken, refreshToken, user } = auth;
 
   try {
@@ -24,7 +24,7 @@ export const setAuthLocalStorage = (auth, name = "celestial") => {
   }
 };
 
-export const getAuthLocalStorage = (name = "celestial") => {
+export const getAuthLocalStorage = (name = "creatibuz_studio") => {
   const accessToken = localStorage.getItem(`${name}_access`);
   const refreshToken = localStorage.getItem(`${name}_refresh`);
   const tokenExp = localStorage.getItem(`${name}_exp`);
@@ -41,7 +41,7 @@ export const getAuthLocalStorage = (name = "celestial") => {
   };
 };
 
-export const removeAuthLocalStorage = (name = "celestial") => {
+export const removeAuthLocalStorage = (name = "creatibuz_studio") => {
   localStorage.removeItem(`${name}_access`);
   localStorage.removeItem(`${name}_refresh`);
   localStorage.removeItem(`${name}_exp`);

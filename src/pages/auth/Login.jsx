@@ -93,7 +93,7 @@ const AdminLogin = () => {
             <img src={logo} alt="logo" className="w-[200px] text-white" />
           </div>
           {/* <h2 className="text-3xl font-bold dark:text-white/75 text-gray-900 mb-2">
-                        Celestial Weather
+                        Creatibuz Studio
                     </h2> */}
         </div>
 

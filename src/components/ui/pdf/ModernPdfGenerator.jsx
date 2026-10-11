@@ -43,7 +43,7 @@ const ModernPdfGenerator = ({
     doc.setFont(mainFont, "bold");
     doc.setFontSize(24);
     doc.setTextColor(colors.primary);
-    doc.text("CELESTIAL WEATHER", 20, 25);
+    doc.text("CREATIBUZ STUDIO", 20, 25);
     doc.setFontSize(10);
     doc.setTextColor(colors.accent);
     doc.text(title, 20, 32);
@@ -365,8 +365,8 @@ const ModernPdfGenerator = ({
 
     doc.setFontSize(8);
     doc.setTextColor(colors.lightText);
-    doc.text("Celestial Weather", 20, footerY);
-    doc.text("contact@ctlweather.com", 20, footerY + 4);
+    doc.text("Creatibuz Studio", 20, footerY);
+    doc.text("contact@creatibuzstudio.com", 20, footerY + 4);
     doc.text("Page 1 of 1", 190, footerY, { align: "right" });
 
     const finalFileName = `${fileName.toLowerCase().replace(/\s+/g, "_")}_${new Date().getTime()}.pdf`;
