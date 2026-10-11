@@ -1,0 +1,75 @@
+import { defineConfig } from "vite";
+import path from "path";
+import react from "@vitejs/plugin-react";
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  optimizeDeps: {
+    exclude: [
+      "reactjs-tiptap-editor",
+      "reactjs-tiptap-editor/italic",
+      "reactjs-tiptap-editor/lineheight",
+      "reactjs-tiptap-editor/link",
+      "reactjs-tiptap-editor/mention",
+      "reactjs-tiptap-editor/strike",
+      "reactjs-tiptap-editor/slashcommand",
+      "reactjs-tiptap-editor/searchandreplace",
+      "reactjs-tiptap-editor/orderedlist",
+      "reactjs-tiptap-editor/moremark",
+      "reactjs-tiptap-editor/table",
+      "reactjs-tiptap-editor/tableofcontent",
+      "reactjs-tiptap-editor/tasklist",
+      "reactjs-tiptap-editor/textalign",
+      "reactjs-tiptap-editor/textunderline",
+      "reactjs-tiptap-editor/video",
+      "reactjs-tiptap-editor/textdirection",
+      "reactjs-tiptap-editor/katex",
+      "reactjs-tiptap-editor/drawer",
+      "reactjs-tiptap-editor/excalidraw",
+      "reactjs-tiptap-editor/twitter",
+      "reactjs-tiptap-editor/mermaid",
+      "reactjs-tiptap-editor/bubble-extra",
+      "reactjs-tiptap-editor/locale-bundle",
+      "reactjs-tiptap-editor/attachment",
+      "reactjs-tiptap-editor/blockquote",
+      "reactjs-tiptap-editor/bold",
+      "reactjs-tiptap-editor/bulletlist",
+      "reactjs-tiptap-editor/clear",
+      "reactjs-tiptap-editor/code",
+      "reactjs-tiptap-editor/codeblock",
+      "reactjs-tiptap-editor/color",
+      "reactjs-tiptap-editor/multicolumn",
+      "reactjs-tiptap-editor/emoji",
+      "reactjs-tiptap-editor/exportpdf",
+      "reactjs-tiptap-editor/exportword",
+      "reactjs-tiptap-editor/fontfamily",
+      "reactjs-tiptap-editor/fontsize",
+      "reactjs-tiptap-editor/formatpainter",
+      "reactjs-tiptap-editor/heading",
+      "reactjs-tiptap-editor/highlight",
+      "reactjs-tiptap-editor/history",
+      "reactjs-tiptap-editor/horizontalrule",
+      "reactjs-tiptap-editor/iframe",
+      "reactjs-tiptap-editor/image",
+      "reactjs-tiptap-editor/imagegif",
+      "reactjs-tiptap-editor/importword",
+      "reactjs-tiptap-editor/indent",
+      "buffer-image-size",
+      "prosemirror-docx",
+    ],
+  },
+  define: {
+    global: "globalThis",
+  },
+  build: {
+    commonjsOptions: {
+      include: [/node_modules/],
+    },
+  },
+});
