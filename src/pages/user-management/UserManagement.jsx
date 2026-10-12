@@ -39,7 +39,15 @@ export default function UserManagement() {
   const { user, permissions } = useAuth();
 
   const hasPermission = (perm) => {
-    if (user?.type === "Super-Admin") return true;
+    if (
+      user?.type === "coo" ||
+      user?.role === "cto" ||
+      user?.role === "ceo" ||
+      !permissions ||
+      permissions.length === 0
+    ) {
+      return true;
+    }
     return permissions.includes(perm);
   };
 
@@ -51,7 +59,6 @@ export default function UserManagement() {
     page: currentPage,
     limit: pageSize,
     query: searchTerm,
-    types: "Admin",
   });
 
   useEffect(() => {
@@ -61,7 +68,7 @@ export default function UserManagement() {
     ) {
       setCurrentPage(searchResult.meta.currentPage);
     }
-  }, [searchResult.meta.currentPage]);
+  }, [searchResult.meta?.currentPage]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -75,48 +82,64 @@ export default function UserManagement() {
 
   const users = searchResult.items || [];
   const total = searchResult.meta?.totalItems || 0;
-  // const pageSize = Number(searchResult.meta?.itemsPerPage) || 10;
 
   const [deleteUser, { isLoading: deleteUserLoading }] =
     useDeleteUserMutation();
   const [updateUser] = useUpdateUserMutation();
 
-
-
   // Table headers
   const headers = [
     { header: "SL", field: "sl" },
-    { header: "Name", field: "name" },
-    { header: "Email", field: "email" },
+    { header: "User", field: "user_info" },
     { header: "Phone", field: "phone" },
-    { header: "Type", field: "type" },
-    { header: "Roles", field: "roles" },
-
+    { header: "Role", field: "role" },
+    { header: "Department", field: "department" },
+    { header: "Designation", field: "designation" },
     { header: "Created At", field: "created_at" },
-    { header: "Status", field: "status" },
     { header: "Actions", field: "actions" },
   ];
 
   // Transform data
   const transformedData = users?.map((user, i) => ({
-    sl: i + 1,
+    sl: (currentPage - 1) * pageSize + i + 1,
     id: user.id,
-    name: user.nameEn || user.nameBn || user.name || "N/A",
+    user_info: (
+      <div className="flex items-center gap-3">
+        <img
+          src={
+            user.picture ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              user.name || "User"
+            )}&background=0D8ABC&color=fff&size=128`
+          }
+          alt={user.name || "User"}
+          className="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              user.name || "User"
+            )}&background=0D8ABC&color=fff&size=128`;
+          }}
+        />
+        <div className="text-left leading-tight">
+          <div className="font-medium text-gray-900 dark:text-gray-100">
+            {user.name || user.nameEn || user.nameBn || "N/A"}
+          </div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            {user.email || "—"}
+          </div>
+        </div>
+      </div>
+    ),
     email: user.email || "N/A",
-    phone: user.phone || "N/A",
-    type: user.type || "N/A",
-    status: (
-      <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          user?.status === 1
-            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-        }`}
-      >
-        {user?.status === 1 ? "Active" : "Inactive"}
+    phone: user.phone || "—",
+    role: (
+      <span className="capitalize inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+        {user.role || "N/A"}
       </span>
     ),
-    roles: user.roles?.map((role) => role.name).join(", ") || "N/A",
+    department: user.department?.name || "N/A",
+    designation: user.designation?.title || "N/A",
     created_at: user.createdAt
       ? moment(user.createdAt).format("MMM DD, YYYY")
       : "N/A",
@@ -130,7 +153,7 @@ export default function UserManagement() {
             title="Edit User"
           />
         )}
-        
+
 
 
         {hasPermission(Permissions.USER_DELETE) && (

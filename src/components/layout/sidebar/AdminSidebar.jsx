@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { adminNavLinks } from "../data";
@@ -26,8 +26,23 @@ const AdminSidebar = () => {
   const isActive = (link) => location.pathname === link;
 
   // parent items stay highlighted while on any of their child routes
-  const isParentActive = (link) =>
-    location.pathname === link || location.pathname.startsWith(link + "/");
+  const isParentActive = (item) => {
+    if (item.link && (location.pathname === item.link || location.pathname.startsWith(item.link + "/"))) {
+      return true;
+    }
+    if (item.children?.some((child) => location.pathname === child.link)) {
+      return true;
+    }
+    return false;
+  };
+
+  useEffect(() => {
+    adminNavLinks.forEach((item) => {
+      if (item.children?.some((child) => location.pathname === child.link)) {
+        setExpandedItems((prev) => new Set([...prev, item.id]));
+      }
+    });
+  }, [location.pathname]);
 
   // filter nav links based on permissions
   const visibleNavLinks = useMemo(() => {
@@ -103,32 +118,41 @@ const AdminSidebar = () => {
           {visibleNavLinks.map((item, i) => (
             <li key={i}>
               <div>
-                <Link
-                  to={item.link}
-                  className={`flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    isParentActive(item.link)
-                      ? "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary font-semibold"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-primary/5 dark:hover:bg-primary/10 hover:text-primary dark:hover:text-primary"
-                  }`}
-                  onClick={() => {
-                    if (item.children && item.children.length > 0)
-                      toggleExpanded(item.id);
-                  }}
-                >
-                  <item.icon className="w-5 h-5 mr-3 flex-shrink-0" />
-                  {!collapsed && (
-                    <>
-                      <span className="flex-1">{item.title}</span>
-                      {item.children && item.children.length > 0 && (
+                {item.children && item.children.length > 0 ? (
+                  <button
+                    type="button"
+                    className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                      isParentActive(item)
+                        ? "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary font-semibold"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-primary/5 dark:hover:bg-primary/10 hover:text-primary dark:hover:text-primary"
+                    }`}
+                    onClick={() => toggleExpanded(item.id)}
+                  >
+                    <item.icon className="w-5 h-5 mr-3 flex-shrink-0" />
+                    {!collapsed && (
+                      <>
+                        <span className="flex-1 text-left">{item.title}</span>
                         <ChevronRight
                           className={`w-4 h-4 transition-transform ${
                             expandedItems.has(item.id) ? "rotate-90" : ""
                           }`}
                         />
-                      )}
-                    </>
-                  )}
-                </Link>
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <Link
+                    to={item.link}
+                    className={`flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                      isActive(item.link)
+                        ? "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary font-semibold"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-primary/5 dark:hover:bg-primary/10 hover:text-primary dark:hover:text-primary"
+                    }`}
+                  >
+                    <item.icon className="w-5 h-5 mr-3 flex-shrink-0" />
+                    {!collapsed && <span className="flex-1">{item.title}</span>}
+                  </Link>
+                )}
               </div>
 
               {/* Submenu */}

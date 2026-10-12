@@ -19,8 +19,16 @@ const PrivateRoute = ({
   }
 
   if (requireAdmin) {
-    // Super-Admin bypasses all permission checks
-    if (user?.type === "Super-Admin") {
+    // Super-Admin or administrative roles bypass permission checks
+    const isAdmin =
+      user?.type === "Super-Admin" ||
+      user?.role === "admin" ||
+      user?.role === "founder" ||
+      user?.role === "ceo" ||
+      user?.role === "coo" ||
+      user?.role === "cto";
+
+    if (isAdmin) {
       return children;
     }
 

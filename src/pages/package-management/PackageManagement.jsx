@@ -3,8 +3,9 @@ import ReusableTable from "@/components/ui/table/reusable-table";
 import PrimaryButton from "@/components/ui/buttons/primary-button";
 import IconButton from "@/components/ui/buttons/icon-button";
 import PackageForm from "@/components/package/PackageForm";
+import PackageDetailsModal from "@/components/package/PackageDetailsModal";
 
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Eye } from "lucide-react";
 import toast from "react-hot-toast";
 import moment from "moment";
 import {
@@ -28,6 +29,12 @@ export default function PackageManagement() {
     data: null,
   });
 
+  // Details modal state
+  const [detailsModalState, setDetailsModalState] = useState({
+    isOpen: false,
+    data: null,
+  });
+
   // Delete modal state & loading
   const [deleteConfirmState, setDeleteConfirmState] = useState({
     isOpen: false,
@@ -37,8 +44,20 @@ export default function PackageManagement() {
   const { user, permissions } = useAuth();
 
   const hasPermission = (perm) => {
-    if (user?.type === "Super-Admin") return true;
-    return permissions.includes(perm);
+    if (
+      !perm ||
+      user?.type === "Super-Admin" ||
+      user?.type === "coo" ||
+      user?.role === "admin" ||
+      user?.role === "ceo" ||
+      user?.role === "cto" ||
+      user?.role === "founder" ||
+      !permissions ||
+      permissions?.length === 0
+    ) {
+      return true;
+    }
+    return permissions?.includes?.(perm) ?? true;
   };
 
   const {
@@ -79,63 +98,78 @@ export default function PackageManagement() {
   // Table headers
   const headers = [
     { header: "SL", field: "sl" },
-    { header: "Section", field: "parentName" },
-    { header: "Name", field: "name" },
+    { header: "Package Name", field: "name" },
+    { header: "Category", field: "category" },
     { header: "Price", field: "price" },
-    { header: "Credits", field: "includedCredits" },
-    { header: "Validity (Days)", field: "validityDays" },
-    { header: "Is Public", field: "isPublic" },
-    { header: "Created At", field: "created_at" },
+    { header: "Duration", field: "duration" },
     { header: "Status", field: "status" },
+    { header: "Created At", field: "created_at" },
     { header: "Actions", field: "actions" },
   ];
 
   // Transform data
-  const transformedData = packages?.map((packageData, i) => ({
-    sl: i + 1,
-    id: packageData.id,
-    parentName: packageData.parent?.name || "N/A",
-    name: packageData.name || "N/A",
-    price: `${packageData.price}`,
-    includedCredits: packageData.includedCredits ?? "N/A",
-    validityDays: packageData.validityDays ?? "N/A",
-    isPublic: packageData.isPublic ? "Yes" : "No",
-    created_at: packageData.createdAt
-      ? moment(packageData.createdAt).format("MMM DD, YYYY")
-      : "N/A",
-    status: (
-      <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          packageData?.status === 1
-            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-        }`}
-      >
-        {packageData?.status === 1 ? "Active" : "Inactive"}
-      </span>
-    ),
-    actions: (
-      <div className="flex items-center justify-center gap-2">
-        {hasPermission(Permissions.PACKAGE_UPDATE) && (
+  const transformedData = packages?.map((packageData, i) => {
+    return {
+      sl: (currentPage - 1) * pageSize + i + 1,
+      id: packageData.id,
+      name: (
+        <span className="font-medium text-gray-900 dark:text-white">
+          {packageData.name || "N/A"}
+        </span>
+      ),
+      category: packageData.category?.name || "—",
+      price: `$${packageData.price ?? 0}`,
+      duration: packageData.duration || "N/A",
+      created_at: packageData.createdAt
+        ? moment(packageData.createdAt).format("MMM DD, YYYY")
+        : "N/A",
+      status: (
+        <span
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+            packageData?.isActive !== false
+              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+          }`}
+        >
+          {packageData?.isActive !== false ? "Active" : "Inactive"}
+        </span>
+      ),
+      actions: (
+        <div className="flex items-center justify-center gap-2">
           <IconButton
-            icon={Edit}
-            onClick={() => handleEdit(packageData.id)}
-            className="text-green-600 hover:text-green-700"
-            title="Edit Package Price"
+            icon={Eye}
+            onClick={() => handleView(packageData.id)}
+            className="text-blue-600 hover:text-blue-700"
+            title="View Package Details"
           />
-        )}
 
-        {hasPermission(Permissions.PACKAGE_DELETE) && (
-          <IconButton
-            icon={Trash2}
-            onClick={() => openDeleteModal([packageData.id])}
-            className="text-red-600 hover:text-red-700"
-            title="Delete Package Price"
-          />
-        )}
-      </div>
-    ),
-  }));
+          {hasPermission(Permissions.PACKAGE_UPDATE) && (
+            <IconButton
+              icon={Edit}
+              onClick={() => handleEdit(packageData.id)}
+              className="text-green-600 hover:text-green-700"
+              title="Edit Package"
+            />
+          )}
+
+          {hasPermission(Permissions.PACKAGE_DELETE) && (
+            <IconButton
+              icon={Trash2}
+              onClick={() => openDeleteModal([packageData.id])}
+              className="text-red-600 hover:text-red-700"
+              title="Delete Package"
+            />
+          )}
+        </div>
+      ),
+    };
+  });
+
+  // View handler
+  const handleView = (id) => {
+    const packageData = packages.find((p) => p.id === id);
+    setDetailsModalState({ isOpen: true, data: packageData });
+  };
 
   // Edit handlers
   const handleEdit = (id) => {
@@ -172,14 +206,14 @@ export default function PackageManagement() {
         await deletePackage(id).unwrap();
       }
       toast.success(
-        `${deleteConfirmState.idsToDelete.length} package price(s) deleted successfully`,
+        `${deleteConfirmState.idsToDelete.length} package(s) deleted successfully`,
       );
       setSelectedItems((prev) =>
         prev.filter((id) => !deleteConfirmState.idsToDelete.includes(id)),
       );
       refetch();
     } catch (err) {
-      toast.error("Failed to delete package price(s)");
+      toast.error("Failed to delete package(s)");
     } finally {
       cancelDelete();
     }
@@ -198,10 +232,10 @@ export default function PackageManagement() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Package Price Management
+            Package Management
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Manage your package prices
+            Manage your packages and pricing
           </p>
         </div>
         {hasPermission(Permissions.PACKAGE_CREATE) && (
@@ -210,7 +244,7 @@ export default function PackageManagement() {
             className="flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            Add New Package Price
+            Add New Package
           </PrimaryButton>
         )}
       </div>
@@ -240,7 +274,7 @@ export default function PackageManagement() {
         />
       </Card>
 
-      {/* Add/Edit Package Price Modal */}
+      {/* Add/Edit Package Modal */}
       <Modal
         isOpen={
           modalState.isOpen &&
@@ -249,8 +283,8 @@ export default function PackageManagement() {
         onClose={handleModalClose}
         title={
           modalState.type === "add"
-            ? "Add New Package Price"
-            : "Edit Package Price"
+            ? "Add New Package"
+            : "Edit Package"
         }
         size="lg"
       >
@@ -267,8 +301,19 @@ export default function PackageManagement() {
         onClose={cancelDelete}
         onConfirm={confirmDelete}
         count={deleteConfirmState.idsToDelete.length}
-        itemName="package price"
+        itemName="package"
         loading={deleteLoading}
+      />
+
+      {/* Package Details Modal */}
+      <PackageDetailsModal
+        isOpen={detailsModalState.isOpen}
+        onClose={() => setDetailsModalState({ isOpen: false, data: null })}
+        packageData={detailsModalState.data}
+        onEdit={(pkg) => {
+          setDetailsModalState({ isOpen: false, data: null });
+          setModalState({ isOpen: true, type: "edit", data: pkg });
+        }}
       />
     </div>
   );

@@ -84,7 +84,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
     adminLogin: builder.mutation({
       query: (data) => {
         return {
-          url: `/auth/admin-login`,
+          url: `/auth/login`,
           method: "POST",
           headers: {
             "Content-Type": "application/json;charset=UTF-8",
@@ -127,7 +127,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
 
     getSingleUser: builder.query({
       query: () => ({
-        url: `/users/get/single-user`,
+        url: `/auth/me`,
         method: "GET",
         credentials: "include",
       }),
@@ -135,7 +135,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
     }),
 
     getCurrentUserInfo: builder.query({
-      query: () => `/users/get/single-user`,
+      query: () => `/auth/me`,
       providesTags: ["users"],
     }),
 

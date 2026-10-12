@@ -3,34 +3,34 @@ import ReusableTable from "@/components/ui/table/reusable-table";
 import PrimaryButton from "@/components/ui/buttons/primary-button";
 import IconButton from "@/components/ui/buttons/icon-button";
 import CustomerForm from "@/components/customer/CustomerForm";
+import CustomerDetailsModal from "@/components/customer/CustomerDetailsModal";
 
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Eye } from "lucide-react";
 import toast from "react-hot-toast";
 import moment from "moment";
 import {
-  useSearchCustomersQuery,
-  useDeleteCustomerMutation,
-} from "@/services/customer/customerApiSlice.js";
+  useGetClientsQuery,
+  useDeleteUserMutation,
+} from "@/services/user/userApiSlice.js";
 import Modal from "@/components/ui/modal.jsx";
 import DeleteConfirmModal from "@/components/ui/modal/DeleteConfirmModal.jsx";
 import { Card } from "@/components/ui/card";
 import useAuth from "@/hooks/useAuth.js";
-
-// You can create a permission for this later if needed, we'll use a dummy placeholder for now
-const Permissions = {
-  CUSTOMER_CREATE: "customer.create",
-  CUSTOMER_UPDATE: "customer.update",
-  CUSTOMER_DELETE: "customer.destroy"
-};
 
 export default function CustomerManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedItems, setSelectedItems] = useState([]);
+  
   const [modalState, setModalState] = useState({
     isOpen: false,
     type: null,
+    data: null,
+  });
+
+  const [detailsState, setDetailsState] = useState({
+    isOpen: false,
     data: null,
   });
 
@@ -40,21 +40,19 @@ export default function CustomerManagement() {
   });
 
   const { user } = useAuth();
-  
-  // For now let's allow access, you can tie this into your permission system later
   const hasPermission = () => true;
 
   const {
     data: searchResult = { items: [], meta: {} },
     isLoading,
     refetch,
-  } = useSearchCustomersQuery({
+  } = useGetClientsQuery({
     page: currentPage,
     limit: pageSize,
     query: searchTerm,
   });
 
-  const [deleteCustomer, { isLoading: deleteLoading }] = useDeleteCustomerMutation();
+  const [deleteCustomer, { isLoading: deleteLoading }] = useDeleteUserMutation();
 
   useEffect(() => {
     if (
@@ -63,7 +61,7 @@ export default function CustomerManagement() {
     ) {
       setCurrentPage(searchResult.meta.currentPage);
     }
-  }, [searchResult.meta.currentPage, currentPage]);
+  }, [searchResult?.meta?.currentPage, currentPage]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -80,44 +78,80 @@ export default function CustomerManagement() {
 
   const headers = [
     { header: "SL", field: "sl" },
-    { header: "Name", field: "name" },
+    { header: "Customer", field: "customer_info" },
     { header: "Email", field: "email" },
     { header: "Phone", field: "phone" },
-    { header: "Created At", field: "created_at" },
+    { header: "Location", field: "location" },
+    { header: "Joined", field: "created_at" },
     { header: "Actions", field: "actions" },
   ];
 
   const transformedData = customers?.map((customer, i) => ({
-    sl: i + 1,
+    sl: (currentPage - 1) * pageSize + i + 1,
     id: customer.id,
-    name: customer.name || "N/A",
-    email: customer.email || "N/A",
-    phone: customer.phone || "N/A",
-    created_at: customer.created_at
-      ? moment(customer.created_at).format("MMM DD, YYYY")
+    customer_info: (
+      <div className="flex items-center gap-3">
+        <img
+          src={
+            customer.picture ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              customer.name || "Customer"
+            )}&background=0D8ABC&color=fff&size=128`
+          }
+          alt={customer.name || "Customer"}
+          className="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              customer.name || "Customer"
+            )}&background=0D8ABC&color=fff&size=128`;
+          }}
+        />
+        <div className="text-left leading-tight">
+          <div className="font-medium text-gray-900 dark:text-gray-100">
+            {customer.name || "N/A"}
+          </div>
+          <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+            Client
+          </span>
+        </div>
+      </div>
+    ),
+    email: customer.email || "—",
+    phone: customer.phone || "—",
+    location: customer.location || customer.address || "—",
+    created_at: customer.createdAt
+      ? moment(customer.createdAt).format("MMM DD, YYYY")
       : "N/A",
     actions: (
       <div className="flex items-center justify-center gap-2">
-        {hasPermission(Permissions.CUSTOMER_UPDATE) && (
-          <IconButton
-            icon={Edit}
-            onClick={() => handleEdit(customer.id)}
-            className="text-green-600 hover:text-green-700"
-            title="Edit Customer"
-          />
-        )}
+        <IconButton
+          icon={Eye}
+          onClick={() => handleViewDetails(customer)}
+          className="text-blue-600 hover:text-blue-700"
+          title="View Details"
+        />
 
-        {hasPermission(Permissions.CUSTOMER_DELETE) && (
-          <IconButton
-            icon={Trash2}
-            onClick={() => openDeleteModal([customer.id])}
-            className="text-red-600 hover:text-red-700"
-            title="Delete Customer"
-          />
-        )}
+        <IconButton
+          icon={Edit}
+          onClick={() => handleEdit(customer.id)}
+          className="text-green-600 hover:text-green-700"
+          title="Edit Customer"
+        />
+
+        <IconButton
+          icon={Trash2}
+          onClick={() => openDeleteModal([customer.id])}
+          className="text-red-600 hover:text-red-700"
+          title="Delete Customer"
+        />
       </div>
     ),
   }));
+
+  const handleViewDetails = (customer) => {
+    setDetailsState({ isOpen: true, data: customer });
+  };
 
   const handleEdit = (id) => {
     const customer = customers.find((c) => c.id === id);
@@ -178,9 +212,16 @@ export default function CustomerManagement() {
             Customer Management
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Manage your customers
+            Manage your registered clients and customer accounts
           </p>
         </div>
+        <PrimaryButton
+          onClick={handleAddNew}
+          className="flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          Add New Customer
+        </PrimaryButton>
       </div>
 
       <Card className="p-8">
@@ -196,7 +237,7 @@ export default function CustomerManagement() {
           enableSorting={true}
           enableSelection={true}
           enableBulkActions={true}
-          searchPlaceholder="Search customers by name or email..."
+          searchPlaceholder="Search customers by name, email, or phone..."
           externalSearchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           onSelectionChange={setSelectedItems}
@@ -207,6 +248,7 @@ export default function CustomerManagement() {
         />
       </Card>
 
+      {/* Add / Edit Customer Modal */}
       <Modal
         isOpen={
           modalState.isOpen &&
@@ -227,6 +269,15 @@ export default function CustomerManagement() {
         />
       </Modal>
 
+      {/* Customer Details Modal */}
+      <CustomerDetailsModal
+        isOpen={detailsState.isOpen}
+        onClose={() => setDetailsState({ isOpen: false, data: null })}
+        customer={detailsState.data}
+        onEdit={(cust) => handleEdit(cust.id)}
+      />
+
+      {/* Delete Confirmation Modal */}
       <DeleteConfirmModal
         isOpen={deleteConfirmState.isOpen}
         onClose={cancelDelete}

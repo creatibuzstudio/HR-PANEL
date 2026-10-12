@@ -6,23 +6,28 @@ import PrimaryButton from "@/components/ui/buttons/primary-button";
 import TextField from "@/components/ui/input/TextField";
 import toast from "react-hot-toast";
 import {
-  useCreateCustomerMutation,
-  useUpdateCustomerMutation,
-} from "@/services/customer/customerApiSlice.js";
+  useAddUserMutation,
+  useUpdateUserMutation,
+} from "@/services/user/userApiSlice.js";
 
 const schema = yup.object({
-  name: yup.string().required("Name is required"),
+  name: yup.string().required("Customer name is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
   phone: yup.string().nullable().optional(),
-  address: yup.string().nullable().optional(),
+  location: yup.string().nullable().optional(),
+  password: yup.string().when("isEditing", {
+    is: (v) => v === false,
+    then: () => yup.string().optional(),
+    otherwise: () => yup.string().optional(),
+  }),
 });
 
 const CustomerForm = ({ customer = null, onSuccess, onCancel }) => {
-  const [createCustomer, { isLoading: createLoading }] = useCreateCustomerMutation();
-  const [updateCustomer, { isLoading: updateLoading }] = useUpdateCustomerMutation();
+  const [addUser, { isLoading: addLoading }] = useAddUserMutation();
+  const [updateUser, { isLoading: updateLoading }] = useUpdateUserMutation();
 
   const isEditing = !!customer;
-  const isLoading = createLoading || updateLoading;
+  const isLoading = addLoading || updateLoading;
 
   const {
     register,
@@ -35,7 +40,9 @@ const CustomerForm = ({ customer = null, onSuccess, onCancel }) => {
       name: "",
       email: "",
       phone: "",
-      address: "",
+      location: "",
+      password: "",
+      isEditing,
     },
   });
 
@@ -45,33 +52,42 @@ const CustomerForm = ({ customer = null, onSuccess, onCancel }) => {
         name: customer.name || "",
         email: customer.email || "",
         phone: customer.phone || "",
-        address: customer.address || "",
+        location: customer.location || customer.address || "",
+        password: "",
+        isEditing: true,
       });
     }
   }, [customer, reset]);
 
   const onSubmit = async (data) => {
     try {
-      if (isEditing) {
-        const result = await updateCustomer({
-          id: customer.id,
-          data,
-        });
+      const payload = {
+        name: data.name,
+        email: data.email,
+        phone: data.phone || undefined,
+        location: data.location || undefined,
+        role: "client",
+      };
 
+      if (!isEditing) {
+        payload.password = data.password || "Client123@";
+        const result = await addUser(payload);
         if (result?.error) {
-          const errMsg = result?.error?.data?.message; toast.error(typeof errMsg === "string" ? errMsg : (Array.isArray(errMsg) ? (typeof errMsg[0] === "string" ? errMsg[0] : "Validation Error") : "An error occurred") || "Failed to update customer");
+          toast.error(result?.error?.data?.message || "Failed to create customer");
         } else {
-          toast.success("Customer updated successfully");
+          toast.success("Customer created successfully");
           reset();
           onSuccess?.();
         }
       } else {
-        const result = await createCustomer(data);
-
+        if (data.password) {
+          payload.password = data.password;
+        }
+        const result = await updateUser({ id: customer.id, ...payload });
         if (result?.error) {
-          const errMsg = result?.error?.data?.message; toast.error(typeof errMsg === "string" ? errMsg : (Array.isArray(errMsg) ? (typeof errMsg[0] === "string" ? errMsg[0] : "Validation Error") : "An error occurred") || "Failed to create customer");
+          toast.error(result?.error?.data?.message || "Failed to update customer");
         } else {
-          toast.success("Customer created successfully");
+          toast.success("Customer updated successfully");
           reset();
           onSuccess?.();
         }
@@ -84,57 +100,62 @@ const CustomerForm = ({ customer = null, onSuccess, onCancel }) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="-mt-1">
-          <TextField
-            label="Name *"
-            type="text"
-            placeholder="Enter full name"
-            register={register}
-            name="name"
-            error={errors.name?.message}
-          />
-        </div>
+        <TextField
+          label="Name *"
+          type="text"
+          placeholder="Enter full name"
+          register={register}
+          name="name"
+          error={errors.name?.message}
+          required
+        />
 
-        <div className="-mt-1">
-          <TextField
-            label="Email *"
-            type="email"
-            placeholder="Enter email address"
-            register={register}
-            name="email"
-            error={errors.email?.message}
-          />
-        </div>
+        <TextField
+          label="Email *"
+          type="email"
+          placeholder="Enter email address"
+          register={register}
+          name="email"
+          error={errors.email?.message}
+          required
+        />
 
-        <div className="-mt-1">
-          <TextField
-            label="Phone"
-            type="text"
-            placeholder="Enter phone number"
-            register={register}
-            name="phone"
-            error={errors.phone?.message}
-          />
-        </div>
+        <TextField
+          label="Phone"
+          type="text"
+          placeholder="Enter phone number"
+          register={register}
+          name="phone"
+          error={errors.phone?.message}
+        />
 
-        <div className="-mt-1">
+        <TextField
+          label="Location / Address"
+          type="text"
+          placeholder="e.g. Dhaka, Bangladesh"
+          register={register}
+          name="location"
+          error={errors.location?.message}
+        />
+
+        <div className="md:col-span-2">
           <TextField
-            label="Address"
-            type="text"
-            placeholder="Enter address"
+            label={isEditing ? "Password (leave blank to keep unchanged)" : "Password (optional, default: Client123@)"}
+            type="password"
+            placeholder={isEditing ? "Leave blank to keep unchanged" : "Client123@"}
             register={register}
-            name="address"
-            error={errors.address?.message}
+            name="password"
+            error={errors.password?.message}
           />
         </div>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-4">
+      <div className="flex justify-end space-x-3 pt-4 border-t dark:border-gray-800">
         <PrimaryButton type="button" onClick={onCancel} variant="secondary">
           Cancel
         </PrimaryButton>
         <PrimaryButton type="submit" disabled={isLoading} className="px-4 py-2">
-          {isLoading ? "Saving..." : isEditing ? "Update" : "Create"}
+          {isLoading ? "Saving..." : isEditing ? "Update Customer" : "Create Customer"}
         </PrimaryButton>
       </div>
     </form>

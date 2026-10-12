@@ -2,8 +2,8 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 // import { userLoggedIn, userLoggedOut } from "@/services/auth/authSlice";
 import { getTokens } from "@/hooks/useToken";
 
-const BASE_URL = 'http://localhost:3000';
-// const MAX_RETRY_COUNT = 3;
+const BASE_URL = "https://api.creatibuzstudio.com";
+
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
@@ -88,7 +88,7 @@ const customMiddleware = (api) => (next) => (action) => {
 export const apiSlice = createApi({
   reducerPath: "apiSlice",
   baseQuery: baseQuery,
-  tagTypes: ["auth", "Role", "users", "user-profile", "Subscription", "NidCheck", "SmsLogs", "Notification", "Package"],
+  tagTypes: ["auth", "Role", "users", "user-profile", "Subscription", "NidCheck", "SmsLogs", "Notification", "Package", "PackageCategory", "Category"],
   keepUnusedDataFor: 0, // Don't keep any unused data
   refetchOnMountOrArgChange: true, // Always refetch when component mounts
   refetchOnReconnect: true, // Refetch on reconnection

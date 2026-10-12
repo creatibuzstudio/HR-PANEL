@@ -54,14 +54,19 @@ const AdminLogin = () => {
     }
 
     try {
+      const email = data.username?.trim();
       const result = await adminLogin({
-        username: data.username,
+        email,
+        username: email,
         password: data.password,
       }).unwrap();
 
-      if (result.accessToken) {
+      const token = result?.accessToken || result?.access_token;
+      const user = result?.user || result?.data;
+
+      if (token) {
         // Store tokens
-        handleAuthSuccess(result?.accessToken, true, result?.data);
+        handleAuthSuccess(token, true, user);
       } else {
         toast.error("Login failed. Please check your credentials.");
       }

@@ -38,23 +38,11 @@ export const adminNavLinks = [
         // requiredPermissions: [Permissions.USER_LIST],
       },
       {
-        title: "Roles",
-        link: "/user-management/roles",
-        // requiredPermissions: [Permissions.ROLE_LIST],
-      },
-      {
-        title: "Role Permissions",
-        link: "/user-management/permissions",
-        // requiredPermissions: [Permissions.ROLE_SHOW, Permissions.ROLE_UPDATE],
+        title: "Customers",
+        link: "/customers",
+        // requiredPermissions: [Permissions.USER_APPROVAL],
       },
     ],
-  },
-  {
-    id: 3,
-    title: "Customers",
-    link: "/customers",
-    icon: UserCheck,
-    // requiredPermissions: [Permissions.USER_APPROVAL],
   },
   {
     id: 12,
@@ -75,6 +63,24 @@ export const adminNavLinks = [
     title: "Settings",
     icon: Settings,
     children: [
+      {
+        title: "Departments",
+        link: "/user-management/roles",
+        // requiredPermissions: [Permissions.ROLE_LIST],
+      },
+      {
+        title: "Designations",
+        link: "/user-management/permissions",
+        // requiredPermissions: [Permissions.ROLE_SHOW, Permissions.ROLE_UPDATE],
+      },
+      {
+        title: "Categories",
+        link: "/categories",
+      },
+      {
+        title: "Package Categories",
+        link: "/package-categories",
+      },
       {
         title: "Services",
         link: "/services",

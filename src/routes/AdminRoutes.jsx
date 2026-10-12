@@ -13,6 +13,8 @@ import InvoiceManagement from "@/pages/invoice-management/InvoiceManagement.jsx"
 import ProductManagement from "@/pages/product-management/ProductManagement.jsx";
 import CustomerManagement from "@/pages/customer-management/CustomerManagement.jsx";
 import ServiceManagement from "@/pages/service-management/ServiceManagement.jsx";
+import PackageCategoryManagement from "@/pages/package-category-management/PackageCategoryManagement.jsx";
+import CategoryManagement from "@/pages/category-management/CategoryManagement.jsx";
 
 import AdminLogin from "@/pages/auth/Login.jsx";
 import AdminMagicLogin from "@/pages/auth/AdminMagicLogin.jsx";
@@ -52,6 +54,22 @@ export const adminRoutes = [
         element: withAdminRoute(PackageManagement, [
           Permissions.PACKAGE_LIST,
         ]),
+      },
+      {
+        path: "categories",
+        element: withAdminRoute(CategoryManagement),
+      },
+      {
+        path: "settings/categories",
+        element: withAdminRoute(CategoryManagement),
+      },
+      {
+        path: "package-categories",
+        element: withAdminRoute(PackageCategoryManagement),
+      },
+      {
+        path: "settings/package-categories",
+        element: withAdminRoute(PackageCategoryManagement),
       },
       {
         path: "products",

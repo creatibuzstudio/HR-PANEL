@@ -9,9 +9,9 @@ import moment from "moment";
 import Modal from "@/components/ui/modal.jsx";
 import DeleteConfirmModal from "@/components/ui/modal/DeleteConfirmModal.jsx";
 import {
-  useDeleteRoleMutation,
-  useGetRolesWithSearchQuery,
-} from "@/services/role/roleApiSlice.js";
+  useDeleteDepartmentMutation,
+  useGetDepartmentsWithSearchQuery,
+} from "@/services/department/departmentApiSlice.js";
 import RoleForm from "@/components/role/RoleForm.jsx";
 import { Card } from "@/components/ui/card";
 import useAuth from "@/hooks/useAuth.js";
@@ -19,17 +19,22 @@ import { Permissions } from "@/constants/permissions.js";
 
 export default function RoleManagement() {
   const [currentPage, setCurrentPage] = useState(1);
-
   const [pageSize, setPageSize] = useState(10);
-
   const [searchTerm, setSearchTerm] = useState("");
-
   const [selectedItems, setSelectedItems] = useState([]);
 
   const { user, permissions } = useAuth();
 
   const hasPermission = (perm) => {
-    if (user?.type === "Super-Admin") return true;
+    if (
+      user?.type === "Super-Admin" ||
+      user?.role === "admin" ||
+      user?.role === "ceo" ||
+      !permissions ||
+      permissions.length === 0
+    ) {
+      return true;
+    }
     return permissions.includes(perm);
   };
 
@@ -49,7 +54,7 @@ export default function RoleManagement() {
     data: searchResult = { items: [], meta: {} },
     isLoading,
     refetch,
-  } = useGetRolesWithSearchQuery({
+  } = useGetDepartmentsWithSearchQuery({
     query: searchTerm,
     limit: pageSize,
     page: currentPage,
@@ -62,7 +67,7 @@ export default function RoleManagement() {
     ) {
       setCurrentPage(searchResult.meta.currentPage);
     }
-  }, [searchResult.meta.currentPage]);
+  }, [searchResult.meta?.currentPage]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -74,58 +79,59 @@ export default function RoleManagement() {
     }
   }, [searchResult]);
 
-  const roles = searchResult.items || [];
+  const departments = searchResult.items || [];
   const total = searchResult.meta?.totalItems || 0;
-  // const pageSize = Number(searchResult.meta?.itemsPerPage) || 10;
 
-  const [deleteRole, { isLoading: deleteRoleLoading }] =
-    useDeleteRoleMutation();
+  const [deleteDepartment, { isLoading: deleteDepartmentLoading }] =
+    useDeleteDepartmentMutation();
 
   // Table headers
   const headers = [
     { header: "SL", field: "sl" },
-    { header: "Name", field: "name" },
-    { header: "Created At", field: "created_at" },
+    { header: "Department Name", field: "name" },
+    { header: "Description", field: "description" },
     { header: "Status", field: "status" },
+    { header: "Created At", field: "created_at" },
     { header: "Actions", field: "actions" },
   ];
 
   // Transform data
-  const transformedData = roles?.map((role, i) => ({
-    sl: i + 1,
-    id: role.id,
-    name: role.name || "N/A",
-    created_at: role.createdAt
-      ? moment(role.createdAt).format("MMM DD, YYYY")
-      : "N/A",
+  const transformedData = departments?.map((dept, i) => ({
+    sl: (currentPage - 1) * pageSize + i + 1,
+    id: dept.id,
+    name: dept.name || "N/A",
+    description: dept.description || "—",
     status: (
       <span
         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          role?.status === 1
+          dept?.isActive !== false
             ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
             : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
         }`}
       >
-        {role?.status === 1 ? "Active" : "Inactive"}
+        {dept?.isActive !== false ? "Active" : "Inactive"}
       </span>
     ),
+    created_at: dept.createdAt
+      ? moment(dept.createdAt).format("MMM DD, YYYY")
+      : "N/A",
     actions: (
       <div className="flex items-center justify-center gap-2">
         {hasPermission(Permissions.ROLE_UPDATE) && (
           <IconButton
             icon={Edit}
-            onClick={() => handleEdit(role.id)}
+            onClick={() => handleEdit(dept.id)}
             className="text-green-600 hover:text-green-700"
-            title="Edit User"
+            title="Edit Department"
           />
         )}
 
         {hasPermission(Permissions.ROLE_DELETE) && (
           <IconButton
             icon={Trash2}
-            onClick={() => openDeleteModal([role.id])}
+            onClick={() => openDeleteModal([dept.id])}
             className="text-red-600 hover:text-red-700"
-            title="Delete User"
+            title="Delete Department"
           />
         )}
       </div>
@@ -134,8 +140,8 @@ export default function RoleManagement() {
 
   // Edit handlers
   const handleEdit = (id) => {
-    const user = roles.find((u) => u.id === id);
-    setModalState({ isOpen: true, type: "edit", data: user });
+    const dept = departments.find((d) => d.id === id);
+    setModalState({ isOpen: true, type: "edit", data: dept });
   };
 
   const handleAddNew = () => {
@@ -164,17 +170,17 @@ export default function RoleManagement() {
   const confirmDelete = async () => {
     try {
       for (const id of deleteConfirmState.idsToDelete) {
-        await deleteRole(id).unwrap();
+        await deleteDepartment(id).unwrap();
       }
       toast.success(
-        `${deleteConfirmState.idsToDelete.length} role(s) deleted successfully`,
+        `${deleteConfirmState.idsToDelete.length} department(s) deleted successfully`,
       );
       setSelectedItems((prev) =>
         prev.filter((id) => !deleteConfirmState.idsToDelete.includes(id)),
       );
       refetch();
     } catch (err) {
-      toast.error("Failed to delete role(s)");
+      toast.error("Failed to delete department(s)");
     } finally {
       cancelDelete();
     }
@@ -193,10 +199,10 @@ export default function RoleManagement() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Role Management
+            Department Management
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Manage your roles
+            Manage your organization departments
           </p>
         </div>
         {hasPermission(Permissions.ROLE_CREATE) && (
@@ -205,7 +211,7 @@ export default function RoleManagement() {
             className="flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            Add New Role
+            Add New Department
           </PrimaryButton>
         )}
       </div>
@@ -224,7 +230,7 @@ export default function RoleManagement() {
           enableSorting={true}
           enableSelection={true}
           enableBulkActions={true}
-          searchPlaceholder="Search roles by name"
+          searchPlaceholder="Search departments by name..."
           externalSearchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           onSelectionChange={setSelectedItems}
@@ -234,14 +240,19 @@ export default function RoleManagement() {
           setPageSize={setPageSize}
         />
       </Card>
-      {/* Add/Edit User Modal */}
+
+      {/* Add/Edit Department Modal */}
       <Modal
         isOpen={
           modalState.isOpen &&
           (modalState.type === "add" || modalState.type === "edit")
         }
         onClose={handleModalClose}
-        title={modalState.type === "add" ? "Add New Role" : "Edit Role"}
+        title={
+          modalState.type === "add"
+            ? "Add New Department"
+            : "Edit Department"
+        }
         size="lg"
       >
         <RoleForm
@@ -257,8 +268,8 @@ export default function RoleManagement() {
         onClose={cancelDelete}
         onConfirm={confirmDelete}
         count={deleteConfirmState.idsToDelete.length}
-        itemName="role"
-        loading={deleteRoleLoading}
+        itemName="department"
+        loading={deleteDepartmentLoading}
       />
     </div>
   );

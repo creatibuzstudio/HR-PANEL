@@ -1,46 +1,46 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import PrimaryButton from "@/components/ui/buttons/primary-button";
 import TextField from "@/components/ui/input/TextField";
-import Checkbox from "@/components/ui/input/Checkbox.jsx";
 import toast from "react-hot-toast";
 import Dropdown from "@/components/ui/dropdown/dropdown.jsx";
-import MultiSelectDropdown from "@/components/ui/dropdown/multiSelectDropdown.jsx";
+import { Plus, X } from "lucide-react";
 import {
   useCreatePackageMutation,
   useUpdatePackageMutation,
-  useGetAllPackagesQuery,
+  useGetPackageCategoriesQuery,
 } from "@/services/package/packageApiSlice.js";
-import { useGetAllServicesQuery } from "@/services/service/serviceApiSlice.js";
 
 // Validation schema
 const schema = yup.object({
-  name: yup.string().required("Name is required"),
-  description: yup.string().nullable().optional(),
+  name: yup.string().required("Package name is required"),
+  description: yup.string().required("Description is required"),
   price: yup
     .number()
     .typeError("Price must be a number")
-    .required("Price is required"),
-  includedCredits: yup
-    .number()
-    .typeError("Included Credits must be a number")
-    .required("Included Credits is required")
-    .min(0, "Minimum is 0"),
-  validityDays: yup
-    .number()
-    .transform((value, originalValue) => (String(originalValue).trim() === '' ? null : value))
-    .nullable()
-    .min(1, "Minimum is 1"),
-  isPublic: yup.boolean().default(true),
-  parentId: yup.number().nullable().optional(),
-  serviceIds: yup
-    .array()
-    .of(yup.number())
-    .optional(),
-  status: yup.number().optional(),
+    .required("Price is required")
+    .min(0, "Price must be positive"),
+  duration: yup.string().required("Duration is required"),
+  isActive: yup.boolean().default(true),
+  categoryId: yup.string().nullable().optional(),
 });
+
+const DURATION_OPTIONS = [
+  { value: "Monthly", label: "Monthly" },
+  { value: "3 Months", label: "3 Months" },
+  { value: "6 Months", label: "6 Months" },
+  { value: "Yearly", label: "Yearly" },
+  { value: "Per Project", label: "Per Project" },
+  { value: "One-Time", label: "One-Time" },
+  { value: "Custom", label: "Custom" },
+];
+
+const statusOptions = [
+  { value: true, label: "Active" },
+  { value: false, label: "Inactive" },
+];
 
 const PackageForm = ({ packageData = null, onSuccess, onCancel }) => {
   const [createPackage, { isLoading: createLoading }] =
@@ -48,21 +48,21 @@ const PackageForm = ({ packageData = null, onSuccess, onCancel }) => {
   const [updatePackage, { isLoading: updateLoading }] =
     useUpdatePackageMutation();
 
-  const { data: packagesData } = useGetAllPackagesQuery();
-  const { data: servicesData } = useGetAllServicesQuery();
+  const { data: categories = [] } = useGetPackageCategoriesQuery();
+
+  const [featuresList, setFeaturesList] = useState([]);
+  const [featureInput, setFeatureInput] = useState("");
 
   const isEditing = !!packageData;
   const isLoading = createLoading || updateLoading;
 
-  const packageOptions = packagesData?.filter(p => p.id !== packageData?.id)?.map(p => ({
-    value: p.id,
-    label: p.name,
-  })) || [];
-
-  const serviceOptions = servicesData?.map(s => ({
-    value: s.id,
-    label: s.name,
-  })) || [];
+  const categoryOptions = [
+    { value: "", label: "None" },
+    ...categories.map((c) => ({
+      value: c.id,
+      label: c.name,
+    })),
+  ];
 
   const {
     register,
@@ -76,12 +76,9 @@ const PackageForm = ({ packageData = null, onSuccess, onCancel }) => {
       name: "",
       description: "",
       price: "",
-      includedCredits: "",
-      validityDays: "",
-      isPublic: true,
-      parentId: null,
-      serviceIds: [],
-      status: 1,
+      duration: "Monthly",
+      isActive: true,
+      categoryId: "",
     },
   });
 
@@ -91,29 +88,61 @@ const PackageForm = ({ packageData = null, onSuccess, onCancel }) => {
         name: packageData.name || "",
         description: packageData.description || "",
         price: packageData.price || "",
-        includedCredits: packageData.includedCredits || "",
-        validityDays: packageData.validityDays || "",
-        isPublic: packageData.isPublic ?? true,
-        parentId: packageData.parentId || null,
-        serviceIds: packageData.services?.map(s => s.id) || [],
-        status: packageData.status ?? 1,
+        duration: packageData.duration || "Monthly",
+        isActive: packageData.isActive !== false,
+        categoryId: packageData.category?.id || "",
       });
+
+      // Populate features
+      if (Array.isArray(packageData.features)) {
+        setFeaturesList(packageData.features);
+      } else if (typeof packageData.features === "string") {
+        setFeaturesList(
+          packageData.features.split(",").map((f) => f.trim()).filter(Boolean)
+        );
+      } else {
+        setFeaturesList([]);
+      }
+    } else {
+      setFeaturesList([]);
+      setFeatureInput("");
     }
   }, [packageData, reset]);
 
+  const handleAddFeature = (e) => {
+    e?.preventDefault();
+    const trimmed = featureInput.trim();
+    if (trimmed) {
+      if (!featuresList.includes(trimmed)) {
+        setFeaturesList((prev) => [...prev, trimmed]);
+      }
+      setFeatureInput("");
+    }
+  };
+
+  const handleRemoveFeature = (index) => {
+    setFeaturesList((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const onSubmit = async (data) => {
     try {
+      if (featuresList.length === 0) {
+        toast.error("Please add at least one feature");
+        return;
+      }
+
       const payload = {
         name: data.name,
-        description: data.description || undefined,
+        description: data.description,
         price: Number(data.price),
-        includedCredits: Number(data.includedCredits),
-        validityDays: data.validityDays ? Number(data.validityDays) : undefined,
-        isPublic: data.isPublic,
-        parentId: data.parentId || null,
-        serviceIds: data.serviceIds,
-        ...(isEditing && { status: data.status }),
+        duration: data.duration,
+        features: featuresList,
+        isActive: data.isActive,
       };
+
+      if (data.categoryId) {
+        payload.category = { id: data.categoryId };
+      }
 
       if (isEditing) {
         const result = await updatePackage({
@@ -122,7 +151,9 @@ const PackageForm = ({ packageData = null, onSuccess, onCancel }) => {
         });
 
         if (result?.error) {
-          const errMsg = result?.error?.data?.message; toast.error(typeof errMsg === "string" ? errMsg : (Array.isArray(errMsg) ? (typeof errMsg[0] === "string" ? errMsg[0] : "Validation Error") : "An error occurred") || "Failed to update package");
+          toast.error(
+            result?.error?.data?.message || "Failed to update package"
+          );
         } else {
           toast.success("Package updated successfully");
           reset();
@@ -132,7 +163,9 @@ const PackageForm = ({ packageData = null, onSuccess, onCancel }) => {
         const result = await createPackage(payload);
 
         if (result?.error) {
-          const errMsg = result?.error?.data?.message; toast.error(typeof errMsg === "string" ? errMsg : (Array.isArray(errMsg) ? (typeof errMsg[0] === "string" ? errMsg[0] : "Validation Error") : "An error occurred") || "Failed to create package");
+          toast.error(
+            result?.error?.data?.message || "Failed to create package"
+          );
         } else {
           toast.success("Package created successfully");
           reset();
@@ -144,161 +177,146 @@ const PackageForm = ({ packageData = null, onSuccess, onCancel }) => {
     }
   };
 
-  const booleanOptions = [
-    { value: true, label: "Yes" },
-    { value: false, label: "No" },
-  ];
-
-  const statusOptions = [
-    { value: 1, label: "Active" },
-    { value: 0, label: "Inactive" },
-  ];
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="-mt-1">
-          <TextField
-            label="Package Name *"
-            type="text"
-            placeholder="Enter package name"
-            register={register}
-            name="name"
-            error={errors.name?.message}
-          />
-        </div>
+        <TextField
+          label="Package Name *"
+          type="text"
+          placeholder="e.g. Starter Brand Package"
+          register={register}
+          name="name"
+          error={errors.name?.message}
+          required
+        />
 
-        <div className="-mt-1">
-          <TextField
-            label="Price *"
-            type="number"
-            step="0.01"
-            placeholder="Enter price"
-            register={register}
-            name="price"
-            error={errors.price?.message}
-          />
-        </div>
+        <TextField
+          label="Price ($) *"
+          type="number"
+          step="0.01"
+          placeholder="e.g. 299"
+          register={register}
+          name="price"
+          error={errors.price?.message}
+          required
+        />
 
-        <div className="-mt-1">
-          <TextField
-            label="Included Credits *"
-            type="number"
-            placeholder="Enter included credits"
-            register={register}
-            name="includedCredits"
-            error={errors.includedCredits?.message}
-          />
-        </div>
-
-        <div className="-mt-1">
-          <TextField
-            label="Validity Days"
-            type="number"
-            placeholder="Enter validity days (optional)"
-            register={register}
-            name="validityDays"
-            error={errors.validityDays?.message}
-          />
-        </div>
-
-        <div className="md:col-span-2 -mt-1">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Section (Optional)
-          </label>
-          <Controller
-            name="parentId"
-            control={control}
-            render={({ field }) => (
-              <Dropdown
-                options={[{ value: null, label: "None" }, ...packageOptions]}
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Select Section"
-              />
-            )}
-          />
-          {errors.parentId && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-              {errors.parentId.message}
-            </p>
+        <Controller
+          name="duration"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Dropdown
+              {...field}
+              LabelName="Duration *"
+              options={DURATION_OPTIONS}
+              placeholder="Select Duration"
+              error={fieldState.error?.message}
+              required
+            />
           )}
-        </div>
+        />
 
-        <div className="md:col-span-2 -mt-1">
-          <Controller
-            control={control}
-            name="serviceIds"
-            render={({ field, fieldState }) => (
-              <MultiSelectDropdown
-                options={serviceOptions}
-                value={field.value}
-                onChange={field.onChange}
-                error={fieldState.error?.message}
-                LabelName="Services Included"
-                placeholder="Select services"
-              />
-            )}
-          />
-        </div>
-        
-        <div className="md:col-span-2 -mt-1">
+        <Controller
+          name="categoryId"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Dropdown
+              {...field}
+              LabelName="Category (Optional)"
+              options={categoryOptions}
+              placeholder="Select Category"
+              error={fieldState.error?.message}
+            />
+          )}
+        />
+
+        <div className="md:col-span-2">
           <TextField
-            label="Description"
+            label="Description *"
             type="text"
-            placeholder="Enter package description"
+            placeholder="Brief description of the package"
             register={register}
             name="description"
             error={errors.description?.message}
+            required
           />
         </div>
 
-        {isEditing && (
-          <div className="md:col-span-2 -mt-1">
-            <Controller
-              name="status"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Dropdown
-                  {...field}
-                  LabelName="Status"
-                  options={statusOptions}
-                  placeholder="Select status"
-                  error={fieldState.error?.message}
-                />
-              )}
+        {/* Dynamic Features List */}
+        <div className="md:col-span-2 space-y-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Package Features *
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={featureInput}
+              onChange={(e) => setFeatureInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleAddFeature();
+                }
+              }}
+              placeholder="Add feature (e.g. 5 Revisions, Source Files Included)"
+              className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-700 rounded-md bg-transparent focus:outline-none focus:ring-1 focus:ring-primary"
             />
+            <button
+              type="button"
+              onClick={handleAddFeature}
+              className="px-3 py-2 text-sm bg-primary text-white rounded-md hover:bg-primary/90 flex items-center gap-1"
+            >
+              <Plus className="w-4 h-4" /> Add
+            </button>
           </div>
-        )}
-        
-        <div className="md:col-span-2 flex items-center pt-2">
-          <Controller
-            name="isPublic"
-            control={control}
-            render={({ field }) => (
-              <Checkbox
-                name="isPublic"
-                value={field.value}
-                setValue={field.onChange}
+
+          {/* Feature Badges */}
+          <div className="flex flex-wrap gap-2 pt-1 max-h-32 overflow-y-auto">
+            {featuresList.map((feat, idx) => (
+              <span
+                key={idx}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
               >
-                Is Public?
-              </Checkbox>
+                {feat}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFeature(idx)}
+                  className="hover:text-red-500 transition"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+            {featuresList.length === 0 && (
+              <p className="text-xs text-gray-400 italic">No features added yet.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="md:col-span-2">
+          <Controller
+            name="isActive"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Dropdown
+                {...field}
+                LabelName="Status"
+                options={statusOptions}
+                placeholder="Select status"
+                error={fieldState.error?.message}
+                required
+              />
             )}
           />
-          {errors.isPublic && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400 ml-3">
-              {errors.isPublic.message}
-            </p>
-          )}
         </div>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-4">
+      <div className="flex justify-end space-x-3 pt-4 border-t dark:border-gray-800">
         <PrimaryButton type="button" onClick={onCancel} variant="secondary">
           Cancel
         </PrimaryButton>
-        <PrimaryButton type="submit" disabled={isLoading} className="px-4 py-2">
-          {isLoading ? "Saving..." : isEditing ? "Update" : "Create"}
+        <PrimaryButton type="submit" disabled={isLoading}>
+          {isLoading ? "Saving..." : isEditing ? "Update Package" : "Create Package"}
         </PrimaryButton>
       </div>
     </form>

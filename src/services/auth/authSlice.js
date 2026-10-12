@@ -17,16 +17,22 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     userLoggedIn: (state, action) => {
-      state.accessToken = action.payload.accessToken;
-      state.isAuthenticated = true;
-      state.user = action.payload.user || null;
+      const token = action.payload.accessToken || action.payload.access_token;
+      const user = action.payload.user || action.payload.data || null;
+      state.accessToken = token;
+      state.isAuthenticated = !!token;
+      state.user = user;
       if (action.payload.rememberMe) {
-        setAuthLocalStorage(action.payload);
+        setAuthLocalStorage({
+          ...action.payload,
+          accessToken: token,
+          user,
+        });
       } else {
         setSessionToken(
-          action.payload.accessToken,
+          token,
           action.payload.refreshToken,
-          action.payload.user || null,
+          user,
         );
       }
     },

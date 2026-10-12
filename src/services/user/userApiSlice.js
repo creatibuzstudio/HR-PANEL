@@ -3,9 +3,105 @@ import { apiSlice } from "@/services/api/apiSlice.js";
 export const userApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getUserWithSearch: builder.query({
-      query: ({ page = 1, limit = 10, query = "", types = "" }) =>
-        `/users/search?page=${page}&limit=${limit}&query=${encodeURIComponent(query)}&types=${types}`,
+      query: () => "/users",
+      transformResponse: (response, meta, arg) => {
+        let items = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response)
+          ? response
+          : response?.items || [];
+
+        // Exclude 'client' role from system users
+        items = items.filter(
+          (u) => u.role?.toLowerCase() !== "client"
+        );
+
+        const query = arg?.query?.toLowerCase()?.trim();
+        if (query) {
+          items = items.filter(
+            (u) =>
+              u.name?.toLowerCase().includes(query) ||
+              u.email?.toLowerCase().includes(query) ||
+              u.phone?.toLowerCase().includes(query) ||
+              u.role?.toLowerCase().includes(query) ||
+              u.department?.name?.toLowerCase().includes(query) ||
+              u.designation?.title?.toLowerCase().includes(query)
+          );
+        }
+
+        const page = Number(arg?.page) || 1;
+        const limit = Number(arg?.limit) || 10;
+        const totalItems = items.length;
+        const totalPages = Math.ceil(totalItems / limit) || 1;
+        const paginatedItems = items.slice((page - 1) * limit, page * limit);
+
+        return {
+          items: paginatedItems,
+          meta: {
+            totalItems,
+            totalPages,
+            currentPage: page,
+            itemsPerPage: limit,
+          },
+        };
+      },
       providesTags: ["users"],
+    }),
+
+    getClients: builder.query({
+      query: () => "/users",
+      transformResponse: (response, meta, arg) => {
+        let items = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response)
+          ? response
+          : response?.items || [];
+
+        // Filter ONLY role === 'client'
+        items = items.filter(
+          (u) => u.role?.toLowerCase() === "client"
+        );
+
+        const query = arg?.query?.toLowerCase()?.trim();
+        if (query) {
+          items = items.filter(
+            (u) =>
+              u.name?.toLowerCase().includes(query) ||
+              u.email?.toLowerCase().includes(query) ||
+              u.phone?.toLowerCase().includes(query) ||
+              u.location?.toLowerCase().includes(query)
+          );
+        }
+
+        const page = Number(arg?.page) || 1;
+        const limit = Number(arg?.limit) || 10;
+        const totalItems = items.length;
+        const totalPages = Math.ceil(totalItems / limit) || 1;
+        const paginatedItems = items.slice((page - 1) * limit, page * limit);
+
+        return {
+          items: paginatedItems,
+          meta: {
+            totalItems,
+            totalPages,
+            currentPage: page,
+            itemsPerPage: limit,
+          },
+        };
+      },
+      providesTags: ["users"],
+    }),
+
+    getDepartments: builder.query({
+      query: () => "/department",
+      transformResponse: (res) => res?.data || res || [],
+      providesTags: ["departments"],
+    }),
+
+    getDesignations: builder.query({
+      query: () => "/designation",
+      transformResponse: (res) => res?.data || res || [],
+      providesTags: ["designations"],
     }),
 
     addUser: builder.mutation({
@@ -32,6 +128,14 @@ export const userApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
       invalidatesTags: ["users"],
+    }),
+
+    uploadImage: builder.mutation({
+      query: (formData) => ({
+        url: "/uploads",
+        method: "POST",
+        body: formData,
+      }),
     }),
 
     getAllRegistrationRequestWithSearch: builder.query({
@@ -112,9 +216,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
 
 export const {
   useGetUserWithSearchQuery,
+  useGetClientsQuery,
+  useGetDepartmentsQuery,
+  useGetDesignationsQuery,
   useDeleteUserMutation,
   useAddUserMutation,
   useUpdateUserMutation,
+  useUploadImageMutation,
   useGetAllRegistrationRequestWithSearchQuery,
   useApproveRegistrationRequestMutation,
   useDeleteRegistrationRequestMutation,

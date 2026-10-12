@@ -21,14 +21,15 @@ export const useInitUser = () => {
   });
 
   useEffect(() => {
-    if (user) {
+    const userData = user?.data || user;
+    if (userData && userData.id) {
       const permissions =
-        user?.roles?.flatMap((role) =>
+        userData?.roles?.flatMap((role) =>
           role?.permissions?.map((perm) => perm.name),
         ) || [];
 
       dispatch(userPermissionsFetched(permissions));
-      dispatch(userDetailsFetched(user));
+      dispatch(userDetailsFetched(userData));
     }
   }, [user, dispatch]);
 
