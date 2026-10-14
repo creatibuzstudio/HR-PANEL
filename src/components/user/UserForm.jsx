@@ -28,6 +28,8 @@ const schema = yup.object({
   role: yup.string().required("Role is required"),
   departmentId: yup.string().optional().nullable(),
   designationId: yup.string().optional().nullable(),
+  order: yup.number().typeError("Order must be a number").default(0),
+  isPreview: yup.boolean().default(false),
 });
 
 const ROLE_OPTIONS = [
@@ -40,6 +42,7 @@ const ROLE_OPTIONS = [
   { value: "coo", label: "COO" },
   { value: "cpm", label: "CPM" },
   { value: "founder", label: "Founder" },
+  { value: "client", label: "Client" },
 ];
 
 const UserForm = ({ user = null, onSuccess, onCancel }) => {
@@ -88,6 +91,8 @@ const UserForm = ({ user = null, onSuccess, onCancel }) => {
       role: "employee",
       departmentId: "",
       designationId: "",
+      order: 0,
+      isPreview: false,
       isEditing,
     },
   });
@@ -102,6 +107,8 @@ const UserForm = ({ user = null, onSuccess, onCancel }) => {
         role: user.role || "employee",
         departmentId: user.department?.id || "",
         designationId: user.designation?.id || "",
+        order: user.order !== undefined && user.order !== null ? Number(user.order) : 0,
+        isPreview: !!user.isPreview,
         isEditing: true,
       });
       setAvatarPreview(user.picture || "");
@@ -154,6 +161,8 @@ const UserForm = ({ user = null, onSuccess, onCancel }) => {
         role: data.role,
         departmentId: data.departmentId ? data.departmentId : undefined,
         designationId: data.designationId ? data.designationId : undefined,
+        order: Number(data.order || 0),
+        isPreview: Boolean(data.isPreview),
       };
 
       if (!isEditing || data.password) {
@@ -322,6 +331,43 @@ const UserForm = ({ user = null, onSuccess, onCancel }) => {
           />
         )}
       />
+
+      {/* Order & Website Preview Section */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">
+        <div>
+          <label className="text-black font-[500] dark:text-white/75 text-[14px] block mb-1">
+            Display Order
+          </label>
+          <input
+            type="number"
+            {...register("order")}
+            placeholder="0"
+            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-700 rounded-md bg-transparent focus:outline-none focus:ring-1 focus:ring-primary font-mono"
+          />
+          <span className="text-[11px] text-gray-500 mt-1 block">
+            Lower numbers appear first (e.g. 1, 2, 3)
+          </span>
+        </div>
+
+        <div className="flex flex-col justify-center">
+          <label className="text-black font-[500] dark:text-white/75 text-[14px] block mb-2">
+            Website Preview
+          </label>
+          <label className="inline-flex items-center cursor-pointer gap-2.5">
+            <input
+              type="checkbox"
+              {...register("isPreview")}
+              className="w-4 h-4 rounded text-primary focus:ring-primary border-gray-300 dark:border-gray-600 cursor-pointer"
+            />
+            <span className="text-sm text-gray-800 dark:text-gray-200 font-medium">
+              Show in "Meet Our Specialist"
+            </span>
+          </label>
+          <span className="text-[11px] text-gray-500 mt-1 block">
+            Preview this team specialist on the website
+          </span>
+        </div>
+      </div>
 
       <div className="flex justify-end gap-3 pt-4">
         <PrimaryButton

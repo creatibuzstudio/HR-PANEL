@@ -8,26 +8,30 @@ const AdminLayout = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#0CABA8]"></div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#0CABA8]"></div>
       </div>
     );
   }
 
   return (
-    <main className="w-screen dark:bg-gray-900 bg-gray-50 dark:text-white/75 text-gray-900 ">
-      <div className="flex overflow-hidden">
-        <AdminSidebar />
+    <div className="flex h-screen w-screen overflow-hidden bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      {/* Fixed Sidebar - does not scroll with page */}
+      <AdminSidebar />
 
-        <div className="flex-1 flex flex-col  min-h-screen overflow-y-hidden">
+      {/* Main Right Column */}
+      <div className="flex-1 flex flex-col h-screen min-w-0 overflow-hidden">
+        {/* Fixed Navbar - pinned at top */}
+        <header className="flex-shrink-0 sticky top-0 z-30">
           <AdminNavbar />
+        </header>
 
-          <div className="flex-1 overflow-y-auto p-6 h-full  ">
-            <Outlet />
-          </div>
-        </div>
+        {/* Scrollable Layout Content Area ONLY */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 restro_scrollbar">
+          <Outlet />
+        </main>
       </div>
-    </main>
+    </div>
   );
 };
 

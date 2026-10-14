@@ -501,7 +501,9 @@ export default function SimpleRichTextEditor({
     [height, initOverrides],
   );
 
-  const effectiveApiKey = import.meta.env.VITE_TINYMCE_API_KEY;
+  const effectiveApiKey =
+    import.meta.env.VITE_TINYMCE_API_KEY ||
+    "mrjzg34xdadqgcqxfqjm0c1ymp23fumthj7ds61a4vlmvlrn";
 
   const handleEditorChange = (content, editor) => {
     // Always normalize content to empty string if null/undefined

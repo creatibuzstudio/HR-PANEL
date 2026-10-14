@@ -6,6 +6,7 @@ const PrivateRoute = ({
   children,
   requireAdmin = false,
   requiredPermissions = [],
+  allowedRoles = [],
 }) => {
   useInitUser();
 
@@ -16,6 +17,18 @@ const PrivateRoute = ({
   // Redirect if not logged in
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Strictly enforce allowedRoles if provided (e.g. only 'ceo' and 'coo')
+  if (allowedRoles && allowedRoles.length > 0) {
+    const userRole = user?.role?.toLowerCase();
+    const userType = user?.type?.toLowerCase();
+    const isRoleAllowed = allowedRoles.some(
+      (r) => r.toLowerCase() === userRole || r.toLowerCase() === userType
+    );
+    if (!isRoleAllowed) {
+      return <Navigate to="/unauthorized" replace />;
+    }
   }
 
   if (requireAdmin) {

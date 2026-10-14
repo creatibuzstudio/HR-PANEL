@@ -44,7 +44,7 @@ const AdminSidebar = () => {
     });
   }, [location.pathname]);
 
-  // filter nav links based on permissions
+  // filter nav links based on permissions and allowed roles
   const visibleNavLinks = useMemo(() => {
     // check if user has required permissions or is Super-Admin
     const hasPermission = (required = []) => {
@@ -53,12 +53,24 @@ const AdminSidebar = () => {
       return required.some((perm) => permissions.includes(perm));
     };
 
+    const hasAllowedRole = (allowedRoles = []) => {
+      if (!allowedRoles || !allowedRoles.length) return true;
+      const userRole = user?.role?.toLowerCase();
+      const userType = user?.type?.toLowerCase();
+      return allowedRoles.some(
+        (r) => r.toLowerCase() === userRole || r.toLowerCase() === userType
+      );
+    };
+
     return adminNavLinks
       ?.map((item) => {
         if (!hasPermission(item.requiredPermissions)) return null;
+        if (!hasAllowedRole(item.allowedRoles)) return null;
         if (item.children) {
-          const visibleChildren = item.children.filter((child) =>
-            hasPermission(child.requiredPermissions),
+          const visibleChildren = item.children.filter(
+            (child) =>
+              hasPermission(child.requiredPermissions) &&
+              hasAllowedRole(child.allowedRoles)
           );
           return { ...item, children: visibleChildren };
         }
@@ -68,37 +80,29 @@ const AdminSidebar = () => {
   }, [user, permissions]);
 
   return (
-    <div
-      className={`bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ${
+    <aside
+      className={`h-screen flex-shrink-0 flex flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 z-40 select-none ${
         collapsed ? "w-16" : "w-64"
       }`}
     >
       {/* Header */}
-      <div className="h-16 flex items-center justify-between px-3.5 border-b border-gray-200 dark:border-gray-700">
+      <div className="h-16 flex-shrink-0 flex items-center justify-between px-3.5 border-b border-gray-200 dark:border-gray-700">
         {!collapsed ? (
-          <div className="flex items-center gap-2.5 overflow-hidden">
+          <Link to="/" className="flex items-center flex-1 min-w-0 pr-2">
             <img
-              className="w-9 h-9 rounded-xl shadow-sm object-cover flex-shrink-0"
+              className="h-10 w-full max-w-[190px] object-contain object-left filter dark:brightness-110"
               src={logo}
               alt="Creatibuz Studio"
             />
-            <div className="flex flex-col min-w-0">
-              <span className="font-bold text-sm tracking-tight text-gray-900 dark:text-white truncate">
-                Creatibuz Studio
-              </span>
-              <span className="text-[10px] font-semibold text-primary uppercase tracking-wider">
-                HR Panel
-              </span>
-            </div>
-          </div>
+          </Link>
         ) : (
-          <div className="mx-auto">
+          <Link to="/" className="mx-auto flex items-center justify-center">
             <img
-              className="w-8 h-8 rounded-lg shadow-sm object-cover"
+              className="w-9 h-9 object-contain"
               src={logo}
               alt="Creatibuz Studio"
             />
-          </div>
+          </Link>
         )}
         <button
           onClick={toggleCollapse}
@@ -113,7 +117,7 @@ const AdminSidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="mt-4 px-2">
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 restro_scrollbar">
         <ul className="space-y-2">
           {visibleNavLinks.map((item, i) => (
             <li key={i}>
@@ -184,7 +188,7 @@ const AdminSidebar = () => {
           ))}
         </ul>
       </nav>
-    </div>
+    </aside>
   );
 };
 

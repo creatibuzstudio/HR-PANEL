@@ -15,13 +15,27 @@ import CustomerManagement from "@/pages/customer-management/CustomerManagement.j
 import ServiceManagement from "@/pages/service-management/ServiceManagement.jsx";
 import PackageCategoryManagement from "@/pages/package-category-management/PackageCategoryManagement.jsx";
 import CategoryManagement from "@/pages/category-management/CategoryManagement.jsx";
+import BlogManagement from "@/pages/blog-management/BlogManagement.jsx";
+import CaseStudyManagement from "@/pages/casestudy-management/CaseStudyManagement.jsx";
+import CreateCaseStudy from "@/pages/casestudy-management/CreateCaseStudy.jsx";
+import EditCaseStudy from "@/pages/casestudy-management/EditCaseStudy.jsx";
+import OrderManagement from "@/pages/order-management/OrderManagement.jsx";
+import FinanceManagement from "@/pages/finance-management/FinanceManagement.jsx";
 
 import AdminLogin from "@/pages/auth/Login.jsx";
 import AdminMagicLogin from "@/pages/auth/AdminMagicLogin.jsx";
 
 // Helper to wrap element with PrivateRoute
-const withAdminRoute = (Component, requiredPermissions = []) => (
-  <PrivateRoute requireAdmin requiredPermissions={requiredPermissions}>
+const withAdminRoute = (
+  Component,
+  requiredPermissions = [],
+  allowedRoles = []
+) => (
+  <PrivateRoute
+    requireAdmin
+    requiredPermissions={requiredPermissions}
+    allowedRoles={allowedRoles}
+  >
     <Component />
   </PrivateRoute>
 );
@@ -32,28 +46,55 @@ export const adminRoutes = [
     element: withAdminRoute(AdminLayout),
     children: [
       { path: "/", element: withAdminRoute(Dashboard) },
+      { path: "overview", element: withAdminRoute(Dashboard) },
       {
         path: "user-management",
         children: [
           {
             path: "all-users",
-            element: withAdminRoute(UserManagement, [Permissions.USER_LIST]),
+            element: withAdminRoute(UserManagement, [], ["ceo", "coo"]),
           },
           {
             path: "roles",
-            element: withAdminRoute(RoleManagement, [Permissions.ROLE_LIST]),
+            element: withAdminRoute(RoleManagement, [], ["ceo", "coo"]),
           },
           {
             path: "permissions",
-            element: withAdminRoute(RolePermissionManagement),
+            element: withAdminRoute(RolePermissionManagement, [], ["ceo", "coo"]),
           },
         ],
       },
       {
         path: "packages",
-        element: withAdminRoute(PackageManagement, [
-          Permissions.PACKAGE_LIST,
-        ]),
+        element: withAdminRoute(PackageManagement, [], ["ceo", "coo"]),
+      },
+      {
+        path: "blogs",
+        element: withAdminRoute(BlogManagement),
+      },
+      {
+        path: "case-studies",
+        element: withAdminRoute(CaseStudyManagement),
+      },
+      {
+        path: "case-studies/create",
+        element: withAdminRoute(CreateCaseStudy),
+      },
+      {
+        path: "case-studies/edit/:id",
+        element: withAdminRoute(EditCaseStudy),
+      },
+      {
+        path: "casestudies",
+        element: withAdminRoute(CaseStudyManagement),
+      },
+      {
+        path: "casestudies/create",
+        element: withAdminRoute(CreateCaseStudy),
+      },
+      {
+        path: "casestudies/edit/:id",
+        element: withAdminRoute(EditCaseStudy),
       },
       {
         path: "categories",
@@ -76,12 +117,20 @@ export const adminRoutes = [
         element: withAdminRoute(ProductManagement, [Permissions.PRODUCT_LIST]),
       },
       {
+        path: "orders",
+        element: withAdminRoute(OrderManagement, [], ["ceo", "coo"]),
+      },
+      {
+        path: "finance",
+        element: withAdminRoute(FinanceManagement, [], ["ceo", "coo"]),
+      },
+      {
         path: "invoices",
-        element: withAdminRoute(InvoiceManagement),
+        element: withAdminRoute(OrderManagement, [], ["ceo", "coo"]),
       },
       {
         path: "customers",
-        element: withAdminRoute(CustomerManagement),
+        element: withAdminRoute(CustomerManagement, [], ["ceo", "coo"]),
       },
       {
         path: "services",

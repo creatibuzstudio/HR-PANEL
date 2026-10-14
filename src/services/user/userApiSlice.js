@@ -92,6 +92,19 @@ export const userApiSlice = apiSlice.injectEndpoints({
       providesTags: ["users"],
     }),
 
+    getAllClientUsers: builder.query({
+      query: () => "/users",
+      transformResponse: (response) => {
+        const raw = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response)
+          ? response
+          : response?.items || [];
+        return raw.filter((u) => u.role?.toLowerCase() === "client");
+      },
+      providesTags: ["users"],
+    }),
+
     getDepartments: builder.query({
       query: () => "/department",
       transformResponse: (res) => res?.data || res || [],
@@ -217,6 +230,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
 export const {
   useGetUserWithSearchQuery,
   useGetClientsQuery,
+  useGetAllClientUsersQuery,
   useGetDepartmentsQuery,
   useGetDesignationsQuery,
   useDeleteUserMutation,

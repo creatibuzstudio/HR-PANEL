@@ -359,14 +359,30 @@ const ModernPdfGenerator = ({
       });
     }
 
-    // Footer - positioned at the bottom of the page
-    const pageHeight = doc.internal.pageSize.height || 297;
-    const footerY = pageHeight - 20;
+    // Executive Dual Authorization Signatures (CEO & COO)
+    const sigY = footerY - 22;
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
+    doc.line(20, sigY, 70, sigY);
+    doc.line(130, sigY, 180, sigY);
 
+    doc.setFont(mainFont, "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(colors.text);
+    doc.text("Chief Executive Officer (CEO)", 45, sigY + 4, { align: "center" });
+    doc.text("Chief Operating Officer (COO)", 155, sigY + 4, { align: "center" });
+
+    doc.setFont(mainFont, "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(colors.lightText);
+    doc.text("Authorized Signature &bull; Creatibuz Studio", 45, sigY + 8, { align: "center" });
+    doc.text("Authorized Signature &bull; Creatibuz Studio", 155, sigY + 8, { align: "center" });
+
+    // Footer - positioned at the bottom of the page
     doc.setFontSize(8);
     doc.setTextColor(colors.lightText);
-    doc.text("Creatibuz Studio", 20, footerY);
-    doc.text("contact@creatibuzstudio.com", 20, footerY + 4);
+    doc.text("Creatibuz Studio - DESIGN - DEVELOP - TRANSFORM", 20, footerY);
+    doc.text("hello@creatibuz.com | creatibuzstudio.com", 20, footerY + 4);
     doc.text("Page 1 of 1", 190, footerY, { align: "right" });
 
     const finalFileName = `${fileName.toLowerCase().replace(/\s+/g, "_")}_${new Date().getTime()}.pdf`;

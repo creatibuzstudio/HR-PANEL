@@ -14,6 +14,9 @@ import {
   MessageSquare,
   ShoppingBag,
   Menu,
+  Newspaper,
+  Layers,
+  PieChart,
 } from "lucide-react";
 import { Permissions } from "@/constants/permissions";
 
@@ -30,17 +33,17 @@ export const adminNavLinks = [
     title: "User Management",
     link: "/user-management/all-users",
     icon: UserCog,
-    // requiredPermissions: [Permissions.USER_LIST],
+    allowedRoles: ["ceo", "coo"],
     children: [
       {
         title: "System Users",
         link: "/user-management/all-users",
-        // requiredPermissions: [Permissions.USER_LIST],
+        allowedRoles: ["ceo", "coo"],
       },
       {
         title: "Customers",
         link: "/customers",
-        // requiredPermissions: [Permissions.USER_APPROVAL],
+        allowedRoles: ["ceo", "coo"],
       },
     ],
   },
@@ -49,14 +52,44 @@ export const adminNavLinks = [
     title: "Packages",
     link: "/packages",
     icon: DollarSign,
-    // requiredPermissions: [Permissions.PACKAGE_LIST],
+    allowedRoles: ["ceo", "coo"],
+  },
+  {
+    id: 17,
+    title: "Orders",
+    link: "/orders",
+    icon: ShoppingBag,
+    requiredPermissions: [],
+    allowedRoles: ["ceo", "coo"],
+  },
+  {
+    id: 18,
+    title: "Finance & Profit Sharing",
+    link: "/finance",
+    icon: PieChart,
+    requiredPermissions: [],
+    allowedRoles: ["ceo", "coo"],
   },
   {
     id: 13,
     title: "Invoices",
     link: "/invoices",
     icon: FileText,
-    // requiredPermissions: [Permissions.INVOICE_LIST],
+    allowedRoles: ["ceo", "coo"],
+  },
+  {
+    id: 15,
+    title: "Blogs",
+    link: "/blogs",
+    icon: Newspaper,
+    requiredPermissions: [],
+  },
+  {
+    id: 16,
+    title: "Case Studies",
+    link: "/case-studies",
+    icon: Layers,
+    requiredPermissions: [],
   },
   {
     id: 14,

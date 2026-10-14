@@ -28,11 +28,12 @@ const TextField = ({
       )}
       <div className="relative">
         <input
+          name={name}
           defaultValue={defaultValue}
           disabled={disabled === true}
           type={isPassword ? (showPassword ? "text" : "password") : type}
           placeholder={placeholder}
-          {...register(name, validation)}
+          {...(typeof register === "function" ? register(name, validation) : {})}
           className={`border-[1px] border-[#E4E4E7] dark:border-white/10 py-2 sm:py-2.5 pr-8 sm:pr-10 bg-white dark:bg-gray-800 w-full outline-none transition-all duration-200 hover:border-primary/60 dark:hover:border-primary/60 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm sm:text-base rounded-md ${
             disabled === true && "bg-gray-400"
           } dark:focus:border-primary dark:text-white/90 ${

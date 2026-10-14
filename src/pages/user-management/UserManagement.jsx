@@ -91,10 +91,12 @@ export default function UserManagement() {
   const headers = [
     { header: "SL", field: "sl" },
     { header: "User", field: "user_info" },
+    { header: "Order", field: "order" },
     { header: "Phone", field: "phone" },
     { header: "Role", field: "role" },
     { header: "Department", field: "department" },
     { header: "Designation", field: "designation" },
+    { header: "Website Preview", field: "isPreview" },
     { header: "Created At", field: "created_at" },
     { header: "Actions", field: "actions" },
   ];
@@ -131,6 +133,11 @@ export default function UserManagement() {
         </div>
       </div>
     ),
+    order: (
+      <span className="font-mono text-xs font-bold text-gray-700 dark:text-gray-300">
+        #{user.order || 0}
+      </span>
+    ),
     email: user.email || "N/A",
     phone: user.phone || "—",
     role: (
@@ -140,6 +147,37 @@ export default function UserManagement() {
     ),
     department: user.department?.name || "N/A",
     designation: user.designation?.title || "N/A",
+    isPreview: (
+      <button
+        type="button"
+        onClick={async () => {
+          try {
+            await updateUser({ id: user.id, isPreview: !user.isPreview }).unwrap();
+            toast.success(
+              !user.isPreview
+                ? "User enabled for website preview"
+                : "User hidden from website preview"
+            );
+            refetch();
+          } catch {
+            toast.error("Failed to update preview status");
+          }
+        }}
+        className={`px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 transition-all ${
+          user.isPreview
+            ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800"
+            : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-400"
+        }`}
+        title="Toggle preview on website"
+      >
+        <span
+          className={`w-1.5 h-1.5 rounded-full ${
+            user.isPreview ? "bg-emerald-500" : "bg-gray-400"
+          }`}
+        />
+        <span>{user.isPreview ? "Previewing" : "Hidden"}</span>
+      </button>
+    ),
     created_at: user.createdAt
       ? moment(user.createdAt).format("MMM DD, YYYY")
       : "N/A",
