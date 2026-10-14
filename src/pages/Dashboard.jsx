@@ -719,9 +719,6 @@ export default function Dashboard() {
                 <div>
                   <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center gap-2">
                     Recent Team Joiners
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                      Real-time Feed
-                    </span>
                   </h3>
                   <p className="text-xs text-gray-500 mt-0.5">
                     Newly onboarded members with exact date & timestamp
