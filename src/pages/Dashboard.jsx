@@ -134,20 +134,20 @@ export default function Dashboard() {
   return (
     <div className="space-y-6 pb-12">
       {/* Top Welcome Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gradient-to-r from-indigo-900 via-indigo-950 to-purple-950 text-white p-6 rounded-2xl shadow-sm border border-indigo-800/40 relative overflow-hidden">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gradient-to-r from-primary via-orange-600 to-amber-600 text-white p-6 rounded-2xl shadow-lg shadow-primary/15 border border-orange-400/30 relative overflow-hidden">
         <div className="relative z-10 space-y-1">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-white/10 text-indigo-200 border border-white/20">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-black/20 text-white border border-white/20 backdrop-blur-xs">
               Enterprise Dashboard
             </span>
-            <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
+            <span className="inline-flex items-center gap-1 text-[11px] text-emerald-200 font-semibold bg-emerald-950/30 px-2.5 py-0.5 rounded-full border border-emerald-400/30">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Live Telemetry
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white drop-shadow-xs">
             Welcome back, {user?.name || "Executive"}!
           </h1>
-          <p className="text-xs sm:text-sm text-indigo-200/80 max-w-xl">
+          <p className="text-xs sm:text-sm text-orange-50/90 max-w-xl font-normal leading-relaxed">
             Live operations, financial collections, project pipeline, and dynamic profit distribution engine.
           </p>
         </div>
@@ -157,38 +157,38 @@ export default function Dashboard() {
             type="button"
             onClick={() => refetch()}
             disabled={isFetching}
-            className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all border border-white/15"
+            className="p-2.5 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 text-white transition-all border border-white/20 shadow-xs"
             title="Refresh Live Statistics"
           >
             <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
           </button>
           <Link
             to="/my-payslips"
-            className="px-4 py-2 text-xs font-bold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-sm flex items-center gap-1.5 transition-all"
+            className="px-4 py-2 text-xs font-bold rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 text-white border border-white/20 shadow-xs flex items-center gap-1.5 transition-all"
           >
-            <FileText className="w-4 h-4 text-emerald-300" /> My Payslips
+            <FileText className="w-4 h-4 text-emerald-200" /> My Payslips
           </Link>
           {isExecutive && (
             <Link
               to="/finance"
-              className="px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md flex items-center gap-1.5 transition-all"
+              className="px-4 py-2 text-xs font-bold rounded-xl bg-black/20 hover:bg-black/30 active:scale-95 text-white border border-white/20 shadow-xs flex items-center gap-1.5 transition-all"
             >
-              <ShieldCheck className="w-4 h-4" /> Finance & Profit Sharing
+              <ShieldCheck className="w-4 h-4 text-amber-200" /> Finance & Profit Sharing
             </Link>
           )}
           {isExecutive && (
             <Link
               to="/orders"
-              className="px-4 py-2 text-xs font-bold rounded-xl bg-primary hover:bg-primary/90 text-white shadow-md flex items-center gap-1.5 transition-all"
+              className="px-4 py-2 text-xs font-bold rounded-xl bg-white hover:bg-orange-50 active:scale-95 text-primary font-bold shadow-md flex items-center gap-1.5 transition-all"
             >
-              <Plus className="w-4 h-4" /> New Order
+              <Plus className="w-4 h-4 stroke-[2.5]" /> New Order
             </Link>
           )}
         </div>
 
-
-        {/* Decorative background glow */}
-        <div className="absolute -top-12 -right-12 w-64 h-64 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
+        {/* Decorative background ambient glows */}
+        <div className="absolute -top-16 -right-16 w-72 h-72 bg-white/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-16 left-1/3 w-64 h-64 bg-amber-300/20 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* Main Core Statistics Cards */}

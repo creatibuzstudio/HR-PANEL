@@ -65,7 +65,7 @@ export const adminRoutes = [
           },
           {
             path: "permissions",
-            element: withAdminRoute(RolePermissionManagement, [], ["ceo", "coo"]),
+            element: withAdminRoute(RolePermissionManagement, [], ["ceo", "coo", "hr"]),
           },
         ],
       },
@@ -75,11 +75,11 @@ export const adminRoutes = [
       },
       {
         path: "blogs",
-        element: withAdminRoute(BlogManagement),
+        element: withAdminRoute(BlogManagement, [], ["ceo", "coo", "hr"]),
       },
       {
         path: "case-studies",
-        element: withAdminRoute(CaseStudyManagement),
+        element: withAdminRoute(CaseStudyManagement, [], ["ceo", "coo", "hr"]),
       },
       {
         path: "case-studies/create",
