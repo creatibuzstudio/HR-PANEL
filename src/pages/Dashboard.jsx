@@ -162,6 +162,12 @@ export default function Dashboard() {
           >
             <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin" : ""}`} />
           </button>
+          <Link
+            to="/my-payslips"
+            className="px-4 py-2 text-xs font-bold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-sm flex items-center gap-1.5 transition-all"
+          >
+            <FileText className="w-4 h-4 text-emerald-300" /> My Payslips
+          </Link>
           {isExecutive && (
             <Link
               to="/finance"
@@ -179,6 +185,7 @@ export default function Dashboard() {
             </Link>
           )}
         </div>
+
 
         {/* Decorative background glow */}
         <div className="absolute -top-12 -right-12 w-64 h-64 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
@@ -360,24 +367,30 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-white dark:bg-[#1a191b] border border-gray-200 dark:border-gray-800 shadow-sm relative overflow-hidden group hover:border-indigo-400 dark:hover:border-indigo-800 transition-all">
+          <Link
+            to="/my-payslips"
+            className="p-5 rounded-2xl bg-white dark:bg-[#1a191b] border border-gray-200 dark:border-gray-800 shadow-sm relative overflow-hidden group hover:border-emerald-400 dark:hover:border-emerald-800 transition-all block"
+          >
             <div className="flex justify-between items-start">
               <div>
                 <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block">
-                  Active Clients
+                  My Pool Share & Payslips
                 </span>
-                <h3 className="text-2xl font-mono font-bold text-indigo-600 dark:text-indigo-400 mt-1">
-                  {totalClients}
+                <h3 className="text-2xl font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+                  {user?.salary || 0}% Share
                 </h3>
               </div>
-              <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
-                <Users className="w-5 h-5" />
+              <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+                <FileText className="w-5 h-5" />
               </div>
             </div>
-            <div className="text-[11px] text-gray-500 mt-3 pt-2.5 border-t dark:border-gray-800">
-              <span>Managed by engineering teams</span>
+            <div className="flex items-center justify-between text-[11px] text-gray-500 mt-3 pt-2.5 border-t dark:border-gray-800">
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                View & Download Statements <ChevronRight className="w-3 h-3" />
+              </span>
             </div>
-          </div>
+          </Link>
+
 
           <div className="p-5 rounded-2xl bg-white dark:bg-[#1a191b] border border-gray-200 dark:border-gray-800 shadow-sm relative overflow-hidden group hover:border-emerald-400 dark:hover:border-emerald-800 transition-all">
             <div className="flex justify-between items-start">

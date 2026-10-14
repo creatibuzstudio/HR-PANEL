@@ -18,8 +18,10 @@ import {
   Layers,
   PieChart,
   Banknote,
+  Receipt,
 } from "lucide-react";
 import { Permissions } from "@/constants/permissions";
+
 
 export const adminNavLinks = [
   {
@@ -30,8 +32,16 @@ export const adminNavLinks = [
     requiredPermissions: [],
   },
   {
+    id: 21,
+    title: "My Info",
+    link: "/my-info",
+    icon: UserCheck,
+    requiredPermissions: [],
+  },
+  {
     id: 2,
     title: "User Management",
+
     link: "/user-management/all-users",
     icon: UserCog,
     allowedRoles: ["ceo", "coo", "hr"],
@@ -79,6 +89,14 @@ export const adminNavLinks = [
     requiredPermissions: [],
     allowedRoles: ["ceo", "coo", "hr"],
   },
+  {
+    id: 20,
+    title: "My Payslips",
+    link: "/my-payslips",
+    icon: Receipt,
+    requiredPermissions: [],
+  },
+
   {
     id: 13,
     title: "Invoices",

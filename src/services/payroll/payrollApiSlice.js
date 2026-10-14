@@ -49,6 +49,18 @@ export const payrollApiSlice = apiSlice.injectEndpoints({
       transformResponse: (response) => response?.data || response,
       providesTags: ["Payroll"],
     }),
+
+    getMyPayslips: builder.query({
+      query: ({ userId, email } = {}) => ({
+        url: "/payroll/my-payslips",
+        params: {
+          ...(userId ? { userId } : {}),
+          ...(email ? { email } : {}),
+        },
+      }),
+      transformResponse: (response) => response?.data || response,
+      providesTags: ["Payroll"],
+    }),
   }),
 });
 
@@ -59,4 +71,6 @@ export const {
   useDisbursePayrollMutation,
   useGetPayrollHistoryQuery,
   useGetPayslipQuery,
+  useGetMyPayslipsQuery,
 } = payrollApiSlice;
+

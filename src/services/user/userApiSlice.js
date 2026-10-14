@@ -224,6 +224,12 @@ export const userApiSlice = apiSlice.injectEndpoints({
       query: ({ id }) => `/users/forecast-category/${id}`,
       providesTags: ["users"],
     }),
+
+    getSingleUser: builder.query({
+      query: (id) => `/users/${id}`,
+      transformResponse: (res) => res?.data || res,
+      providesTags: (result, error, id) => [{ type: "users", id }],
+    }),
   }),
 });
 
@@ -244,4 +250,6 @@ export const {
   useCreateCustomerMutation,
   useUpdateCustomerMutation,
   useGetUsersByForecastCategoryQuery,
+  useGetSingleUserQuery,
 } = userApiSlice;
+

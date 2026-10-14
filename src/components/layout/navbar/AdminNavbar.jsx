@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Bell, Search, User, LogOut, ChevronDown, Menu } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Bell, Search, User, LogOut, ChevronDown, Menu, UserCheck } from "lucide-react";
+
 import { useDispatch } from "react-redux";
 import { userLoggedOut } from "@/services/auth/authSlice";
 import { toast } from "react-hot-toast";
@@ -122,14 +123,14 @@ const AdminNavbar = () => {
                 </p>
               </div>
 
-              {/*<Link*/}
-              {/*  to="/admin/settings"*/}
-              {/*  className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"*/}
-              {/*  onClick={() => setShowDropdown(false)}*/}
-              {/*>*/}
-              {/*  <Settings className="w-4 h-4 mr-3" />*/}
-              {/*  Settings*/}
-              {/*</Link>*/}
+              <Link
+                to="/my-info"
+                className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                onClick={() => setShowDropdown(false)}
+              >
+                <UserCheck className="w-4 h-4 mr-3 text-primary" />
+                My Info & ID Card
+              </Link>
 
               <button
                 onClick={handleLogout}
@@ -139,6 +140,7 @@ const AdminNavbar = () => {
                 Logout
               </button>
             </div>
+
           )}
         </div>
       </div>

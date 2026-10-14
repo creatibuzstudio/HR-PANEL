@@ -27,9 +27,37 @@ export default function EmployeePayslipModal({
 
   if (!isOpen || !employee) return null;
 
+  const effectiveMonthName =
+    monthName || employee.monthlyPayroll?.monthName || "Monthly Statement";
+  const effectiveMonthYear =
+    monthYear || employee.monthlyPayroll?.monthYear || "";
+
+  const displayName =
+    employee.recipientName || employee.name || employee.user?.name || "Employee";
+  const displayEmail =
+    employee.recipientEmail || employee.email || employee.user?.email || "";
+  const displayRole =
+    employee.designation ||
+    employee.recipientRole ||
+    employee.role ||
+    employee.user?.designation?.title ||
+    "Team Member";
+  const displayDepartment =
+    employee.department ||
+    employee.user?.department?.name ||
+    employee.user?.department ||
+    "General";
+  const displayPhone = employee.phone || employee.user?.phone || "";
+  const displayPicture = employee.picture || employee.user?.picture;
+  const poolSharePercent =
+    employee.profitSharePercent ??
+    employee.poolSharePercent ??
+    employee.baseSalary ??
+    0;
+
   const voucherNumber =
     employee.voucherNumber ||
-    `PAY-${monthYear?.replace("-", "") || "202610"}-${employee.userId?.slice(-4) || "1001"}`;
+    `PAY-${effectiveMonthYear?.replace("-", "") || "202610"}-${employee.userId?.slice(-4) || "1001"}`;
 
   const copyVoucherNumber = () => {
     navigator.clipboard.writeText(voucherNumber);
@@ -39,7 +67,7 @@ export default function EmployeePayslipModal({
   const handlePrint = () => {
     printElement(
       printRef.current || "printable-employee-payslip",
-      `Payslip-${employee.name?.replace(/\s+/g, "_")}-${monthYear}`
+      `Payslip-${displayName.replace(/\s+/g, "_")}-${effectiveMonthYear || "statement"}`
     );
   };
 
@@ -99,7 +127,7 @@ export default function EmployeePayslipModal({
               </div>
               <div className="mt-1 flex items-center justify-start sm:justify-end gap-2">
                 <span className="text-xs text-gray-500 font-semibold">
-                  Period: {monthName}
+                  Period: {effectiveMonthName}
                 </span>
                 <span
                   className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${
@@ -125,27 +153,27 @@ export default function EmployeePayslipModal({
           {/* Employee Information */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
             <div className="flex items-start gap-3.5">
-              {employee.picture ? (
+              {displayPicture ? (
                 <img
-                  src={employee.picture}
-                  alt={employee.name}
+                  src={displayPicture}
+                  alt={displayName}
                   className="w-14 h-14 rounded-full object-cover border-2 border-primary shrink-0"
                 />
               ) : (
                 <div className="w-14 h-14 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xl shrink-0">
-                  {employee.name?.charAt(0).toUpperCase() || "E"}
+                  {displayName?.charAt(0).toUpperCase() || "E"}
                 </div>
               )}
               <div className="space-y-0.5">
                 <span className="inline-block px-2 py-0.5 text-[11px] font-bold uppercase rounded-md mb-1 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">
-                  {employee.designation || employee.role || "Team Member"}
+                  {displayRole}
                 </span>
                 <h3 className="font-bold text-base text-gray-900 dark:text-white">
-                  {employee.name}
+                  {displayName}
                 </h3>
-                <p className="text-xs text-gray-500">{employee.email}</p>
-                {employee.phone && (
-                  <p className="text-xs text-gray-400">{employee.phone}</p>
+                <p className="text-xs text-gray-500">{displayEmail}</p>
+                {displayPhone && (
+                  <p className="text-xs text-gray-400">{displayPhone}</p>
                 )}
               </div>
             </div>
@@ -154,7 +182,7 @@ export default function EmployeePayslipModal({
               <div>
                 <span className="text-gray-400 block">Department:</span>
                 <span className="font-semibold text-gray-800 dark:text-gray-200">
-                  {employee.department || "General"}
+                  {displayDepartment}
                 </span>
               </div>
               <div>
@@ -192,10 +220,10 @@ export default function EmployeePayslipModal({
               <div className="p-3.5 flex justify-between items-center bg-emerald-50/40 dark:bg-emerald-950/20">
                 <div>
                   <p className="font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                    <TrendingUp className="w-4 h-4" /> Finance Employee Pool Allocation ({employee.poolSharePercent || employee.baseSalary || 0}%)
+                    <TrendingUp className="w-4 h-4" /> Finance Employee Pool Allocation ({poolSharePercent}%)
                   </p>
                   <p className="text-xs text-emerald-600/80 dark:text-emerald-400/80">
-                    Calculated strictly as {employee.poolSharePercent || employee.baseSalary || 0}% of the Finance Employee Pool for {monthName}
+                    Calculated strictly as {poolSharePercent}% of the Finance Employee Pool for {effectiveMonthName}
                   </p>
                 </div>
                 <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-base">

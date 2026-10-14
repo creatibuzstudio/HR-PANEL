@@ -22,6 +22,9 @@ import EditCaseStudy from "@/pages/casestudy-management/EditCaseStudy.jsx";
 import OrderManagement from "@/pages/order-management/OrderManagement.jsx";
 import FinanceManagement from "@/pages/finance-management/FinanceManagement.jsx";
 import PayrollManagement from "@/pages/payroll/PayrollManagement.jsx";
+import MyPayslips from "@/pages/payroll/MyPayslips.jsx";
+import MyInfo from "@/pages/user/MyInfo.jsx";
+
 
 import AdminLogin from "@/pages/auth/Login.jsx";
 import AdminMagicLogin from "@/pages/auth/AdminMagicLogin.jsx";
@@ -130,6 +133,16 @@ export const adminRoutes = [
         path: "payroll",
         element: withAdminRoute(PayrollManagement, [], ["ceo", "coo"]),
       },
+      {
+        path: "my-payslips",
+        element: withAdminRoute(MyPayslips),
+      },
+      {
+        path: "my-info",
+        element: withAdminRoute(MyInfo),
+      },
+
+
       {
         path: "invoices",
         element: withAdminRoute(OrderManagement, [], ["ceo", "coo"]),
