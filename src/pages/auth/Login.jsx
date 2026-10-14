@@ -94,19 +94,19 @@ const AdminLogin = () => {
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center flex flex-col items-center">
-          <div className="relative mb-3 group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-orange-600 to-amber-500 rounded-3xl blur opacity-35 group-hover:opacity-60 transition duration-500"></div>
+          <div className="relative mb-3 group flex items-center justify-center">
+            <div className="absolute -inset-2 bg-gradient-to-r from-orange-600/20 to-amber-500/20 rounded-2xl blur-lg opacity-40 group-hover:opacity-75 transition duration-500"></div>
             <img
               src={logo}
               alt="Creatibuz Studio"
-              className="relative w-20 h-20 rounded-2xl shadow-xl object-cover ring-2 ring-orange-500/30"
+              className="relative h-14 sm:h-16 w-auto max-w-[280px] sm:max-w-[320px] object-contain drop-shadow-md filter dark:brightness-110"
             />
           </div>
-          <h2 className="text-2xl font-bold dark:text-white text-gray-900 tracking-tight">
-            Creatibuz Studio
-          </h2>
-          <p className="text-xs font-semibold text-primary uppercase tracking-wider mt-1">
-            HR Management Portal
+          <p className="text-xs font-bold text-primary uppercase tracking-widest mt-1">
+            Executive & HR Management Portal
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+            Sign in to access your administrative workspace
           </p>
         </div>
 
