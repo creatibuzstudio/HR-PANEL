@@ -507,29 +507,52 @@ body::-webkit-scrollbar-thumb {
   #printable-order-invoice,
   #printable-capital-invoice,
   #printable-expense-voucher,
-  #printable-executive-dividend {
+  #printable-executive-dividend,
+  #printable-employee-payslip {
     position: static !important;
     display: block !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
+    padding: 20px !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
     box-shadow: none !important;
     background: #ffffff !important;
     color: #111827 !important;
+  }
+
+  /* Preserve grid and flex columns on paper */
+  .grid.lg\:grid-cols-4,
+  .grid.sm\:grid-cols-2 {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .grid.grid-cols-2 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+  }
+
+  .sm\:flex-row {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
   }
 
   /* Ensure text is dark and legible on paper */
   #printable-order-invoice [class*="dark:text-"],
   #printable-capital-invoice [class*="dark:text-"],
   #printable-expense-voucher [class*="dark:text-"],
-  #printable-executive-dividend [class*="dark:text-"] {
+  #printable-executive-dividend [class*="dark:text-"],
+  #printable-employee-payslip [class*="dark:text-"] {
     color: inherit !important;
   }
 
   /* Prevent page breaks inside tables and signatures */
-  table, tr, td, th {
+  table, tr, td, th, .signature-block {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
