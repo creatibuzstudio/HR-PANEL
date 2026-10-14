@@ -6,7 +6,7 @@ import PrimaryButton from "@/components/ui/buttons/primary-button";
 import TextField from "@/components/ui/input/TextField";
 import toast from "react-hot-toast";
 import Dropdown from "@/components/ui/dropdown/dropdown.jsx";
-import { Camera, X, Upload } from "lucide-react";
+import { Camera, X, Upload, DollarSign } from "lucide-react";
 import {
   useAddUserMutation,
   useUpdateUserMutation,
@@ -32,6 +32,11 @@ const schema = yup.object({
   isPreview: yup.boolean().default(false),
   dateOfBirth: yup.string().optional().nullable(),
   joiningDate: yup.string().optional().nullable(),
+  salary: yup
+    .number()
+    .typeError("Salary must be a number")
+    .min(0, "Salary cannot be negative")
+    .default(0),
 });
 
 const ROLE_OPTIONS = [
@@ -94,6 +99,7 @@ const UserForm = ({ user = null, onSuccess, onCancel }) => {
       departmentId: "",
       designationId: "",
       order: 0,
+      salary: 0,
       isPreview: false,
       dateOfBirth: "",
       joiningDate: "",
@@ -112,6 +118,7 @@ const UserForm = ({ user = null, onSuccess, onCancel }) => {
         departmentId: user.department?.id || "",
         designationId: user.designation?.id || "",
         order: user.order !== undefined && user.order !== null ? Number(user.order) : 0,
+        salary: user.salary !== undefined && user.salary !== null ? Number(user.salary) : 0,
         isPreview: !!user.isPreview,
         dateOfBirth: user.dateOfBirth || "",
         joiningDate: user.joiningDate || "",
@@ -339,6 +346,33 @@ const UserForm = ({ user = null, onSuccess, onCancel }) => {
           />
         )}
       />
+
+      {/* Monthly Base Salary Section */}
+      <div className="p-3.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 space-y-1.5">
+        <label className="text-black font-[500] dark:text-white/75 text-[14px] flex items-center justify-between mb-1">
+          <span className="flex items-center gap-1.5">
+            <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            Monthly Base Salary ($)
+          </span>
+          <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold uppercase tracking-wider">
+            Payroll & Pool Distribution
+          </span>
+        </label>
+        <div className="relative">
+          <span className="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400 font-bold">$</span>
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            {...register("salary")}
+            placeholder="0.00"
+            className="w-full pl-8 pr-3 py-2 text-sm border border-emerald-300 dark:border-emerald-700/60 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono font-semibold text-gray-900 dark:text-gray-100"
+          />
+        </div>
+        <span className="text-[11px] text-gray-500 dark:text-gray-400 block">
+          Configured base monthly compensation used for payroll calculations
+        </span>
+      </div>
 
       {/* Date of Birth & Joining Date Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

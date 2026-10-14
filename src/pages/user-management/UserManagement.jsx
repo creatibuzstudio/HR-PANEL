@@ -96,6 +96,7 @@ export default function UserManagement() {
     { header: "Role", field: "role" },
     { header: "Department", field: "department" },
     { header: "Designation", field: "designation" },
+    { header: "Salary", field: "salary" },
     { header: "Birthday", field: "dateOfBirth" },
     { header: "Joined Date", field: "joiningDate" },
     { header: "Website Preview", field: "isPreview" },
@@ -161,6 +162,11 @@ export default function UserManagement() {
     ),
     department: user.department?.name || "N/A",
     designation: user.designation?.title || "N/A",
+    salary: (
+      <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/40">
+        ${Number(user.salary || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+      </span>
+    ),
     dateOfBirth: user.dateOfBirth ? (
       <span className="inline-flex items-center gap-1 text-xs font-semibold text-pink-600 dark:text-pink-400 bg-pink-50 dark:bg-pink-950/40 px-2 py-0.5 rounded-md border border-pink-200 dark:border-pink-800/50">
         🎂 {moment(user.dateOfBirth).format("MMM DD")}

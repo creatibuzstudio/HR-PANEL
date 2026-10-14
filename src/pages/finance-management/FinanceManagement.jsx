@@ -17,6 +17,7 @@ import ApproveExpenseModal from "./ApproveExpenseModal";
 import QuickAdjustPercentagesModal from "./QuickAdjustPercentagesModal";
 
 import PrimaryButton from "@/components/ui/buttons/primary-button";
+import { Link } from "react-router-dom";
 import {
   DollarSign,
   TrendingUp,
@@ -35,6 +36,7 @@ import {
   Briefcase,
   Edit,
   ShieldAlert,
+  Banknote,
 } from "lucide-react";
 import useAuth from "@/hooks/useAuth";
 
@@ -165,6 +167,14 @@ export default function FinanceManagement() {
           >
             <RefreshCw className="w-4 h-4" />
           </button>
+          <Link
+            to="/payroll"
+            className="px-3 py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors flex items-center gap-1.5 shadow-sm"
+            title="Open Monthly Payroll & Profit Distribution"
+          >
+            <Banknote className="w-4 h-4" />
+            Monthly Payroll
+          </Link>
           <button
             onClick={() => setIsQuickAdjustModalOpen(true)}
             className="px-3 py-2 text-xs font-semibold rounded-lg border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 transition-colors flex items-center gap-1.5"

@@ -17,6 +17,7 @@ import {
   Newspaper,
   Layers,
   PieChart,
+  Banknote,
 } from "lucide-react";
 import { Permissions } from "@/constants/permissions";
 
@@ -33,17 +34,17 @@ export const adminNavLinks = [
     title: "User Management",
     link: "/user-management/all-users",
     icon: UserCog,
-    allowedRoles: ["ceo", "coo"],
+    allowedRoles: ["ceo", "coo", "hr"],
     children: [
       {
         title: "System Users",
         link: "/user-management/all-users",
-        allowedRoles: ["ceo", "coo"],
+        allowedRoles: ["ceo", "coo", "hr"],
       },
       {
         title: "Customers",
         link: "/customers",
-        allowedRoles: ["ceo", "coo"],
+        allowedRoles: ["ceo", "coo", "hr"],
       },
     ],
   },
@@ -52,7 +53,7 @@ export const adminNavLinks = [
     title: "Packages",
     link: "/packages",
     icon: DollarSign,
-    allowedRoles: ["ceo", "coo"],
+    allowedRoles: ["ceo", "coo", "hr"],
   },
   {
     id: 17,
@@ -68,14 +69,22 @@ export const adminNavLinks = [
     link: "/finance",
     icon: PieChart,
     requiredPermissions: [],
-    allowedRoles: ["ceo", "coo"],
+    allowedRoles: ["ceo", "coo", "hr"],
+  },
+  {
+    id: 19,
+    title: "Payroll Management",
+    link: "/payroll",
+    icon: Banknote,
+    requiredPermissions: [],
+    allowedRoles: ["ceo", "coo", "hr"],
   },
   {
     id: 13,
     title: "Invoices",
     link: "/invoices",
     icon: FileText,
-    allowedRoles: ["ceo", "coo"],
+    allowedRoles: ["ceo", "coo", "hr"],
   },
   {
     id: 15,

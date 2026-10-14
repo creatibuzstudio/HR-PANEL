@@ -21,6 +21,7 @@ import CreateCaseStudy from "@/pages/casestudy-management/CreateCaseStudy.jsx";
 import EditCaseStudy from "@/pages/casestudy-management/EditCaseStudy.jsx";
 import OrderManagement from "@/pages/order-management/OrderManagement.jsx";
 import FinanceManagement from "@/pages/finance-management/FinanceManagement.jsx";
+import PayrollManagement from "@/pages/payroll/PayrollManagement.jsx";
 
 import AdminLogin from "@/pages/auth/Login.jsx";
 import AdminMagicLogin from "@/pages/auth/AdminMagicLogin.jsx";
@@ -124,6 +125,10 @@ export const adminRoutes = [
       {
         path: "finance",
         element: withAdminRoute(FinanceManagement, [], ["ceo", "coo"]),
+      },
+      {
+        path: "payroll",
+        element: withAdminRoute(PayrollManagement, [], ["ceo", "coo"]),
       },
       {
         path: "invoices",
