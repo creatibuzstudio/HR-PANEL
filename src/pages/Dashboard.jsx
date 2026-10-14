@@ -59,6 +59,7 @@ export default function Dashboard() {
   const recentOrders = statsData?.recentOrders || [];
   const upcomingBirthdays = statsData?.upcomingBirthdays || [];
   const newJoiners = statsData?.newJoiners || [];
+  const runningMonthName = statsData?.runningMonthName || "This Month";
 
   const revenueTrend = charts.revenueTrend || [];
   const orderStatusDistribution = charts.orderStatusDistribution || [];
@@ -587,6 +588,9 @@ export default function Dashboard() {
                 <div>
                   <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center gap-2">
                     Upcoming Birthdays
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-100 dark:bg-pink-900/60 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800">
+                      {runningMonthName}
+                    </span>
                     {upcomingBirthdays.some((b) => b.isToday) && (
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-pink-500 text-white animate-bounce shadow-sm">
                         🎉 Birthday Today!
@@ -594,7 +598,7 @@ export default function Dashboard() {
                     )}
                   </h3>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    Team members' special days countdown from user records
+                    Team members celebrating birthdays in {runningMonthName}
                   </p>
                 </div>
               </div>
@@ -615,10 +619,10 @@ export default function Dashboard() {
                     <Gift className="w-6 h-6" />
                   </div>
                   <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                    No Upcoming Birthdays Registered
+                    No Birthdays in {runningMonthName}
                   </div>
                   <p className="text-xs text-gray-500 max-w-sm mx-auto">
-                    Add birth dates to user profiles in User Management to see live upcoming birthday celebrations and alerts here.
+                    No registered birthdays for team members in {runningMonthName}. Update user birth dates in User Management.
                   </p>
                   <Link
                     to="/user-management/all-users"
@@ -703,7 +707,7 @@ export default function Dashboard() {
               Automated milestone alerts
             </span>
             <span className="font-semibold text-gray-700 dark:text-gray-300">
-              {upcomingBirthdays.length} birthday(s) upcoming
+              {upcomingBirthdays.length} birthday(s) in {runningMonthName}
             </span>
           </div>
         </div>
