@@ -4,7 +4,7 @@ import PrimaryButton from "@/components/ui/buttons/primary-button";
 import IconButton from "@/components/ui/buttons/icon-button";
 import UserForm from "@/components/user/UserForm"; // adjust path
 
-import { Plus, Edit, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
+import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, Share2 } from "lucide-react";
 import toast from "react-hot-toast";
 import moment from "moment";
 import {
@@ -96,8 +96,9 @@ export default function UserManagement() {
     { header: "Role", field: "role" },
     { header: "Department", field: "department" },
     { header: "Designation", field: "designation" },
+    { header: "Birthday", field: "dateOfBirth" },
+    { header: "Joined Date", field: "joiningDate" },
     { header: "Website Preview", field: "isPreview" },
-    { header: "Created At", field: "created_at" },
     { header: "Actions", field: "actions" },
   ];
 
@@ -147,6 +148,24 @@ export default function UserManagement() {
     ),
     department: user.department?.name || "N/A",
     designation: user.designation?.title || "N/A",
+    dateOfBirth: user.dateOfBirth ? (
+      <span className="inline-flex items-center gap-1 text-xs font-semibold text-pink-600 dark:text-pink-400 bg-pink-50 dark:bg-pink-950/40 px-2 py-0.5 rounded-md border border-pink-200 dark:border-pink-800/50">
+        🎂 {moment(user.dateOfBirth).format("MMM DD")}
+      </span>
+    ) : (
+      <span className="text-xs text-gray-400 italic">Not set</span>
+    ),
+    joiningDate: user.joiningDate ? (
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 dark:text-indigo-400">
+        🚀 {moment(user.joiningDate).format("MMM DD, YYYY")}
+      </span>
+    ) : user.createdAt ? (
+      <span className="text-xs text-gray-500 font-mono">
+        {moment(user.createdAt).format("MMM DD, YYYY")}
+      </span>
+    ) : (
+      <span className="text-xs text-gray-400">—</span>
+    ),
     isPreview: (
       <button
         type="button"
@@ -178,9 +197,6 @@ export default function UserManagement() {
         <span>{user.isPreview ? "Previewing" : "Hidden"}</span>
       </button>
     ),
-    created_at: user.createdAt
-      ? moment(user.createdAt).format("MMM DD, YYYY")
-      : "N/A",
     actions: (
       <div className="flex items-center justify-center gap-2">
         {hasPermission(Permissions.USER_UPDATE) && (
@@ -273,15 +289,31 @@ export default function UserManagement() {
             Manage your users
           </p>
         </div>
-        {hasPermission(Permissions.USER_CREATE) && (
-          <PrimaryButton
-            onClick={handleAddNew}
-            className="flex items-center gap-2"
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => {
+              const url = `${window.location.origin}/register`;
+              navigator.clipboard.writeText(url);
+              toast.success("Employee Registration link copied! Share it with new joiners.");
+            }}
+            className="px-3.5 py-2 text-xs font-semibold rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+            title="Copy shareable link for employee self-registration"
           >
-            <Plus className="w-4 h-4" />
-            Add New User
-          </PrimaryButton>
-        )}
+            <Share2 className="w-3.5 h-3.5" />
+            Share Registration Link
+          </button>
+
+          {hasPermission(Permissions.USER_CREATE) && (
+            <PrimaryButton
+              onClick={handleAddNew}
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add New User
+            </PrimaryButton>
+          )}
+        </div>
       </div>
 
       {/* Table */}

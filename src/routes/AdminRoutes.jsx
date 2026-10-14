@@ -24,6 +24,7 @@ import FinanceManagement from "@/pages/finance-management/FinanceManagement.jsx"
 
 import AdminLogin from "@/pages/auth/Login.jsx";
 import AdminMagicLogin from "@/pages/auth/AdminMagicLogin.jsx";
+import EmployeeRegister from "@/pages/auth/EmployeeRegister.jsx";
 
 // Helper to wrap element with PrivateRoute
 const withAdminRoute = (
@@ -147,4 +148,7 @@ export const adminRoutes = [
   },
   { path: "/login", element: <AdminLogin /> },
   { path: "/admin/magic-login", element: <AdminMagicLogin /> },
+  { path: "/register", element: <EmployeeRegister /> },
+  { path: "/join", element: <EmployeeRegister /> },
+  { path: "/employee-register", element: <EmployeeRegister /> },
 ];

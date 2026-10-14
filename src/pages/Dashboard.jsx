@@ -25,7 +25,13 @@ import {
   ChevronRight,
   Sparkles,
   AlertCircle,
+  Cake,
+  Gift,
+  UserPlus,
+  Calendar,
+  Share2,
 } from "lucide-react";
+import toast from "react-hot-toast";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -51,6 +57,8 @@ export default function Dashboard() {
   const overview = statsData?.overview || {};
   const charts = statsData?.charts || {};
   const recentOrders = statsData?.recentOrders || [];
+  const upcomingBirthdays = statsData?.upcomingBirthdays || [];
+  const newJoiners = statsData?.newJoiners || [];
 
   const revenueTrend = charts.revenueTrend || [];
   const orderStatusDistribution = charts.orderStatusDistribution || [];
@@ -562,6 +570,266 @@ export default function Dashboard() {
                 <span className="font-bold text-gray-900 dark:text-white">{item.value} order(s)</span>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Team Milestones & People Hub: Upcoming Birthdays & Recent Joins */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        {/* Left (6 cols): Upcoming Birthdays */}
+        <div className="lg:col-span-6 bg-white dark:bg-[#1a191b] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col justify-between">
+          <div>
+            <div className="p-5 border-b dark:border-gray-800 flex justify-between items-center bg-gradient-to-r from-pink-500/5 via-rose-500/5 to-transparent">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-pink-100 dark:bg-pink-950/60 text-pink-600 dark:text-pink-400 flex items-center justify-center shadow-sm border border-pink-200 dark:border-pink-800/60">
+                  <Cake className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center gap-2">
+                    Upcoming Birthdays
+                    {upcomingBirthdays.some((b) => b.isToday) && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-pink-500 text-white animate-bounce shadow-sm">
+                        🎉 Birthday Today!
+                      </span>
+                    )}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Team members' special days countdown from user records
+                  </p>
+                </div>
+              </div>
+
+              <Link
+                to="/user-management/all-users"
+                className="text-xs font-semibold text-pink-600 dark:text-pink-400 hover:underline flex items-center gap-1"
+                title="Manage employee birthdays"
+              >
+                Team List <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="p-4 divide-y divide-gray-100 dark:divide-gray-800/80">
+              {upcomingBirthdays.length === 0 ? (
+                <div className="py-8 text-center px-4 space-y-3">
+                  <div className="w-12 h-12 mx-auto rounded-full bg-pink-50 dark:bg-pink-950/40 text-pink-400 flex items-center justify-center">
+                    <Gift className="w-6 h-6" />
+                  </div>
+                  <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                    No Upcoming Birthdays Registered
+                  </div>
+                  <p className="text-xs text-gray-500 max-w-sm mx-auto">
+                    Add birth dates to user profiles in User Management to see live upcoming birthday celebrations and alerts here.
+                  </p>
+                  <Link
+                    to="/user-management/all-users"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-pink-50 dark:bg-pink-950/50 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800 hover:bg-pink-100 transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Set Birthdays in User Management
+                  </Link>
+                </div>
+              ) : (
+                upcomingBirthdays.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`py-3 flex items-center justify-between gap-3 transition-colors rounded-xl px-2.5 ${
+                      item.isToday
+                        ? "bg-gradient-to-r from-pink-500/10 via-rose-500/10 to-transparent border border-pink-500/30 shadow-sm"
+                        : "hover:bg-gray-50/70 dark:hover:bg-gray-800/30"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="relative">
+                        <img
+                          src={
+                            item.picture ||
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                              item.name || "User"
+                            )}&background=EC4899&color=fff&size=128`
+                          }
+                          alt={item.name}
+                          className="w-10 h-10 rounded-full object-cover border-2 border-pink-300 dark:border-pink-700 flex-shrink-0"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                              item.name || "User"
+                            )}&background=EC4899&color=fff&size=128`;
+                          }}
+                        />
+                        {item.isToday && (
+                          <span className="absolute -bottom-1 -right-1 text-xs">
+                            🎂
+                          </span>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-bold text-sm text-gray-900 dark:text-white truncate flex items-center gap-1.5">
+                          {item.name}
+                          <span className="capitalize text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                            {item.role}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-500 truncate">
+                          {item.designation} • {item.department}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-xs font-mono font-bold text-gray-800 dark:text-gray-200 flex items-center justify-end gap-1">
+                        <Calendar className="w-3 h-3 text-pink-500" />
+                        {item.formattedDate}
+                      </div>
+                      <span
+                        className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                          item.isToday
+                            ? "bg-pink-500 text-white animate-pulse shadow-sm"
+                            : item.daysRemaining === 1
+                            ? "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700"
+                            : "bg-pink-100 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300"
+                        }`}
+                      >
+                        {item.statusText}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className="p-3 bg-gray-50/60 dark:bg-gray-800/30 border-t dark:border-gray-800 text-[11px] text-gray-500 flex items-center justify-between">
+            <span className="flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-pink-500" />
+              Automated milestone alerts
+            </span>
+            <span className="font-semibold text-gray-700 dark:text-gray-300">
+              {upcomingBirthdays.length} birthday(s) upcoming
+            </span>
+          </div>
+        </div>
+
+        {/* Right (6 cols): Recent Team Joiners */}
+        <div className="lg:col-span-6 bg-white dark:bg-[#1a191b] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col justify-between">
+          <div>
+            <div className="p-5 border-b dark:border-gray-800 flex justify-between items-center bg-gradient-to-r from-indigo-500/5 via-blue-500/5 to-transparent">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-sm border border-indigo-200 dark:border-indigo-800/60">
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center gap-2">
+                    Recent Team Joiners
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                      Real-time Feed
+                    </span>
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Newly onboarded members with exact date & timestamp
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = `${window.location.origin}/register`;
+                    navigator.clipboard.writeText(url);
+                    toast.success("Employee Registration link copied! Share it with new joiners.");
+                  }}
+                  className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-all flex items-center gap-1 cursor-pointer"
+                  title="Copy shareable link for employee registration"
+                >
+                  <Share2 className="w-3 h-3" />
+                  Copy Join Link
+                </button>
+                <Link
+                  to="/user-management/all-users"
+                  className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+                  title="View all users"
+                >
+                  All Users <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="p-4 divide-y divide-gray-100 dark:divide-gray-800/80">
+              {newJoiners.length === 0 ? (
+                <div className="py-8 text-center px-4 space-y-2">
+                  <div className="w-12 h-12 mx-auto rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-400 flex items-center justify-center">
+                    <Users className="w-6 h-6" />
+                  </div>
+                  <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                    No Team Members Recorded
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Newly added team members will automatically appear here with their joining timestamp.
+                  </p>
+                </div>
+              ) : (
+                newJoiners.map((item) => (
+                  <div
+                    key={item.id}
+                    className="py-3 flex items-center justify-between gap-3 hover:bg-gray-50/70 dark:hover:bg-gray-800/30 transition-colors rounded-xl px-2.5"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="relative">
+                        <img
+                          src={
+                            item.picture ||
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                              item.name || "User"
+                            )}&background=4F46E5&color=fff&size=128`
+                          }
+                          alt={item.name}
+                          className="w-10 h-10 rounded-full object-cover border-2 border-indigo-200 dark:border-indigo-800 flex-shrink-0"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                              item.name || "User"
+                            )}&background=4F46E5&color=fff&size=128`;
+                          }}
+                        />
+                        {item.isNew && (
+                          <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-gray-900" title="New Joiner" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-bold text-sm text-gray-900 dark:text-white truncate flex items-center gap-1.5">
+                          {item.name}
+                          <span className="capitalize text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                            {item.role}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-500 truncate">
+                          {item.designation} • {item.department}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right flex-shrink-0 space-y-0.5">
+                      <div className="text-xs font-semibold text-gray-900 dark:text-white flex items-center justify-end gap-1">
+                        <Clock className="w-3.5 h-3.5 text-indigo-500" />
+                        {item.relativeTime}
+                      </div>
+                      <div className="text-[11px] font-mono text-gray-500 dark:text-gray-400" title="Exact Join Timestamp">
+                        {item.fullDateTime}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className="p-3 bg-gray-50/60 dark:bg-gray-800/30 border-t dark:border-gray-800 text-[11px] text-gray-500 flex items-center justify-between">
+            <span className="flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+              Directly synced from User Registry
+            </span>
+            <span className="font-semibold text-gray-700 dark:text-gray-300">
+              {newJoiners.length} latest member(s)
+            </span>
           </div>
         </div>
       </div>

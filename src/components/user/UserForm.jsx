@@ -30,6 +30,8 @@ const schema = yup.object({
   designationId: yup.string().optional().nullable(),
   order: yup.number().typeError("Order must be a number").default(0),
   isPreview: yup.boolean().default(false),
+  dateOfBirth: yup.string().optional().nullable(),
+  joiningDate: yup.string().optional().nullable(),
 });
 
 const ROLE_OPTIONS = [
@@ -93,6 +95,8 @@ const UserForm = ({ user = null, onSuccess, onCancel }) => {
       designationId: "",
       order: 0,
       isPreview: false,
+      dateOfBirth: "",
+      joiningDate: "",
       isEditing,
     },
   });
@@ -109,6 +113,8 @@ const UserForm = ({ user = null, onSuccess, onCancel }) => {
         designationId: user.designation?.id || "",
         order: user.order !== undefined && user.order !== null ? Number(user.order) : 0,
         isPreview: !!user.isPreview,
+        dateOfBirth: user.dateOfBirth || "",
+        joiningDate: user.joiningDate || "",
         isEditing: true,
       });
       setAvatarPreview(user.picture || "");
@@ -163,6 +169,8 @@ const UserForm = ({ user = null, onSuccess, onCancel }) => {
         designationId: data.designationId ? data.designationId : undefined,
         order: Number(data.order || 0),
         isPreview: Boolean(data.isPreview),
+        dateOfBirth: data.dateOfBirth || null,
+        joiningDate: data.joiningDate || null,
       };
 
       if (!isEditing || data.password) {
@@ -331,6 +339,37 @@ const UserForm = ({ user = null, onSuccess, onCancel }) => {
           />
         )}
       />
+
+      {/* Date of Birth & Joining Date Section */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="text-black font-[500] dark:text-white/75 text-[14px] flex items-center gap-1.5 mb-1">
+            🎂 Date of Birth (Birthday)
+          </label>
+          <input
+            type="date"
+            {...register("dateOfBirth")}
+            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-700 rounded-md bg-transparent focus:outline-none focus:ring-1 focus:ring-primary text-gray-900 dark:text-gray-100"
+          />
+          <span className="text-[11px] text-gray-500 mt-1 block">
+            Used for upcoming birthday alerts on dashboard
+          </span>
+        </div>
+
+        <div>
+          <label className="text-black font-[500] dark:text-white/75 text-[14px] flex items-center gap-1.5 mb-1">
+            🚀 Official Joining Date
+          </label>
+          <input
+            type="date"
+            {...register("joiningDate")}
+            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-700 rounded-md bg-transparent focus:outline-none focus:ring-1 focus:ring-primary text-gray-900 dark:text-gray-100"
+          />
+          <span className="text-[11px] text-gray-500 mt-1 block">
+            Leave blank to use registration date
+          </span>
+        </div>
+      </div>
 
       {/* Order & Website Preview Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700">
