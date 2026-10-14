@@ -89,18 +89,18 @@ export default function DisbursePayrollModal({
           </div>
 
           <div className="flex justify-between items-center text-xs">
-            <span className="text-gray-600 dark:text-gray-400">Total Monthly Base Salaries:</span>
+            <span className="text-gray-600 dark:text-gray-400">Total Monthly Employee Pool:</span>
             <span className="font-bold text-gray-900 dark:text-white font-mono">
-              ${totalBase.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              ${totalProfitShare.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </span>
           </div>
 
           <div className="flex justify-between items-center text-xs">
             <span className="text-emerald-700 dark:text-emerald-400 font-medium">
-              Employee Pool Profit Share (from Finance %):
+              Total Allocated Across Employees:
             </span>
             <span className="font-bold text-emerald-700 dark:text-emerald-400 font-mono">
-              +${totalProfitShare.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              {summaryData?.summary?.totalAllocatedPercent || 0}% of Pool
             </span>
           </div>
 

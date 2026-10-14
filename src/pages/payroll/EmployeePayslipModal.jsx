@@ -189,31 +189,17 @@ export default function EmployeePayslipModal({
               <span>Amount ($)</span>
             </div>
             <div className="divide-y divide-gray-100 dark:divide-gray-800/60 text-sm">
-              <div className="p-3.5 flex justify-between items-center">
-                <div>
-                  <p className="font-semibold text-gray-800 dark:text-gray-200">
-                    Monthly Base Salary
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Contracted monthly base salary compensation
-                  </p>
-                </div>
-                <span className="font-mono font-bold text-gray-900 dark:text-gray-100">
-                  ${baseSalary.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                </span>
-              </div>
-
               <div className="p-3.5 flex justify-between items-center bg-emerald-50/40 dark:bg-emerald-950/20">
                 <div>
                   <p className="font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                    <TrendingUp className="w-4 h-4" /> Company Profit Share Dividend
+                    <TrendingUp className="w-4 h-4" /> Finance Employee Pool Allocation ({employee.poolSharePercent || employee.baseSalary || 0}%)
                   </p>
                   <p className="text-xs text-emerald-600/80 dark:text-emerald-400/80">
-                    Distributed from Finance Employee Pool % ({monthName})
+                    Calculated strictly as {employee.poolSharePercent || employee.baseSalary || 0}% of the Finance Employee Pool for {monthName}
                   </p>
                 </div>
-                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                  +${profitShare.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-base">
+                  ${profitShare.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
               </div>
 

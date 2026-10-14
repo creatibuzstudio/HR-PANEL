@@ -6,7 +6,7 @@ import PrimaryButton from "@/components/ui/buttons/primary-button";
 import TextField from "@/components/ui/input/TextField";
 import toast from "react-hot-toast";
 import Dropdown from "@/components/ui/dropdown/dropdown.jsx";
-import { Camera, X, Upload, DollarSign } from "lucide-react";
+import { Camera, X, Upload, DollarSign, Percent } from "lucide-react";
 import {
   useAddUserMutation,
   useUpdateUserMutation,
@@ -347,30 +347,31 @@ const UserForm = ({ user = null, onSuccess, onCancel }) => {
         )}
       />
 
-      {/* Monthly Base Salary Section */}
+      {/* Salary Share (% of Employee Pool) Section */}
       <div className="p-3.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 space-y-1.5">
         <label className="text-black font-[500] dark:text-white/75 text-[14px] flex items-center justify-between mb-1">
           <span className="flex items-center gap-1.5">
-            <DollarSign className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            Monthly Base Salary ($)
+            <Percent className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            Salary Share (% of Employee Pool)
           </span>
           <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold uppercase tracking-wider">
-            Payroll & Pool Distribution
+            Finance Pool %
           </span>
         </label>
         <div className="relative">
-          <span className="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400 font-bold">$</span>
           <input
             type="number"
             step="0.01"
             min="0"
+            max="100"
             {...register("salary")}
-            placeholder="0.00"
-            className="w-full pl-8 pr-3 py-2 text-sm border border-emerald-300 dark:border-emerald-700/60 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono font-semibold text-gray-900 dark:text-gray-100"
+            placeholder="e.g. 20 (means 20%)"
+            className="w-full pl-3 pr-8 py-2 text-sm border border-emerald-300 dark:border-emerald-700/60 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono font-semibold text-gray-900 dark:text-gray-100"
           />
+          <span className="absolute right-3 top-2.5 text-gray-500 dark:text-gray-400 font-bold">%</span>
         </div>
-        <span className="text-[11px] text-gray-500 dark:text-gray-400 block">
-          Configured base monthly compensation used for payroll calculations
+        <span className="text-[11px] text-gray-500 dark:text-gray-400 block leading-relaxed">
+          এই সংখ্যাটি যত % দিবেন (যেমন: 20%), প্রতি মাসে Finance-এর Employee Pool থেকে ঠিক তত % টাকা এই এমপ্লয়ীর কাছে যাবে।
         </span>
       </div>
 

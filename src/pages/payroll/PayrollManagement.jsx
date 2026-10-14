@@ -314,12 +314,12 @@ export default function PayrollManagement() {
               <Users className="w-5 h-5" />
             </div>
           </div>
-          <p className="text-[11px] text-gray-400 mt-3 flex items-center justify-between">
+          <div className="mt-3 flex items-center justify-between text-[11px] text-gray-400">
             <span>{employeePool.totalEligibleCount || employees.length} active employee(s)</span>
             <span className="font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
-              ~${Number(employeePool.equalSharePerEmployee || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}/each
+              Allocated: {summaryData?.summary?.totalAllocatedPercent || employeePool.totalAllocatedPercent || 0}% of Pool
             </span>
-          </p>
+          </div>
         </div>
 
         {/* CEO Monthly Share */}
@@ -615,7 +615,7 @@ export default function PayrollManagement() {
               Employee Payroll & Profit Pool Distribution
             </h2>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              Base Salary + Distributed Share from Employee Pool ({employeePool.percent || 30}%)
+              Finance Employee Pool ({employeePool.percent || 30}%) distributed strictly by each employee's configured %
             </p>
           </div>
 
@@ -653,9 +653,9 @@ export default function PayrollManagement() {
               <tr>
                 <th className="py-3 px-4">Employee</th>
                 <th className="py-3 px-4">Role & Dept</th>
-                <th className="py-3 px-4">Monthly Base Salary</th>
-                <th className="py-3 px-4">Profit Pool Share ({monthName})</th>
-                <th className="py-3 px-4 font-bold text-gray-900 dark:text-white">Net Payable</th>
+                <th className="py-3 px-4">Salary Share (%)</th>
+                <th className="py-3 px-4">Employee Pool Basis</th>
+                <th className="py-3 px-4 font-bold text-gray-900 dark:text-white">Net Monthly Payout ($)</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4 text-right">Payslip</th>
               </tr>
@@ -711,16 +711,18 @@ export default function PayrollManagement() {
                         </div>
                       </td>
 
-                      <td className="py-3.5 px-4 font-mono font-bold text-gray-800 dark:text-gray-200">
-                        ${Number(emp.baseSalary || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      <td className="py-3.5 px-4">
+                        <span className="font-mono font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/40">
+                          {Number(emp.poolSharePercent ?? emp.baseSalary ?? 0)}% of Pool
+                        </span>
                       </td>
 
-                      <td className="py-3.5 px-4 font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                        +${Number(emp.profitShareAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      <td className="py-3.5 px-4 font-mono text-gray-500 dark:text-gray-400">
+                        ${Number(employeePool.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </td>
 
                       <td className="py-3.5 px-4 font-mono font-extrabold text-sm text-primary">
-                        ${Number(emp.netPayable || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        ${Number(emp.netPayable || emp.profitShareAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </td>
 
                       <td className="py-3.5 px-4">
