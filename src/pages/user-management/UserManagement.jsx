@@ -4,7 +4,7 @@ import PrimaryButton from "@/components/ui/buttons/primary-button";
 import IconButton from "@/components/ui/buttons/icon-button";
 import UserForm from "@/components/user/UserForm"; // adjust path
 
-import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, Share2 } from "lucide-react";
+import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, Share2, Download } from "lucide-react";
 import toast from "react-hot-toast";
 import moment from "moment";
 import {
@@ -108,22 +108,35 @@ export default function UserManagement() {
     id: user.id,
     user_info: (
       <div className="flex items-center gap-3">
-        <img
-          src={
-            user.picture ||
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(
-              user.name || "User"
-            )}&background=0D8ABC&color=fff&size=128`
-          }
-          alt={user.name || "User"}
-          className="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0"
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-              user.name || "User"
-            )}&background=0D8ABC&color=fff&size=128`;
-          }}
-        />
+        <div className="relative group/avatar flex-shrink-0">
+          <img
+            src={
+              user.picture ||
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                user.name || "User"
+              )}&background=0D8ABC&color=fff&size=256`
+            }
+            alt={user.name || "User"}
+            className="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                user.name || "User"
+              )}&background=0D8ABC&color=fff&size=256`;
+            }}
+          />
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDownloadPhoto(user);
+            }}
+            className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer shadow-sm"
+            title="Download User Photo"
+          >
+            <Download className="w-3.5 h-3.5" />
+          </button>
+        </div>
         <div className="text-left leading-tight">
           <div className="font-medium text-gray-900 dark:text-gray-100">
             {user.name || user.nameEn || user.nameBn || "N/A"}
@@ -199,6 +212,13 @@ export default function UserManagement() {
     ),
     actions: (
       <div className="flex items-center justify-center gap-2">
+        <IconButton
+          icon={Download}
+          onClick={() => handleDownloadPhoto(user)}
+          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/40"
+          title="Download User Photo"
+        />
+
         {hasPermission(Permissions.USER_UPDATE) && (
           <IconButton
             icon={Edit}
@@ -207,8 +227,6 @@ export default function UserManagement() {
             title="Edit User"
           />
         )}
-
-
 
         {hasPermission(Permissions.USER_DELETE) && (
           <IconButton
@@ -221,6 +239,51 @@ export default function UserManagement() {
       </div>
     ),
   }));
+
+  // Download Photo handler
+  const handleDownloadPhoto = async (targetUser) => {
+    const photoUrl =
+      targetUser.picture ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        targetUser.name || "User"
+      )}&background=0D8ABC&color=fff&size=512`;
+
+    const sanitizedName = (targetUser.name || "user")
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "_");
+    const filename = `${sanitizedName}_photo.jpg`;
+
+    toast.loading("Downloading photo...", { id: "photo-download" });
+
+    try {
+      const response = await fetch(photoUrl, { mode: "cors" });
+      if (!response.ok) throw new Error("Network response was not ok");
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+      toast.success("Photo downloaded successfully!", { id: "photo-download" });
+    } catch (error) {
+      try {
+        const link = document.createElement("a");
+        link.href = photoUrl;
+        link.target = "_blank";
+        link.download = filename;
+        link.rel = "noopener noreferrer";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success("Opened photo for download!", { id: "photo-download" });
+      } catch (err) {
+        toast.error("Failed to download photo.", { id: "photo-download" });
+      }
+    }
+  };
 
   // Edit handlers
   const handleEdit = (id) => {

@@ -469,11 +469,11 @@ export default function EmployeeRegister() {
               </div>
             </div>
 
-            {/* Note about role and department */}
-            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2.5">
-              <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+            {/* Note about department and designation */}
+            <div className="p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400 flex items-start gap-2.5">
+              <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
               <span>
-                Default role is set to <strong>Employee</strong>. Your official department and designation will be assigned by company administration upon verification.
+                Your official department and designation will be assigned by company administration upon verification.
               </span>
             </div>
 
