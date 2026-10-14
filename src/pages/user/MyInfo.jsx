@@ -196,45 +196,10 @@ export default function MyInfo() {
       : "";
 
   return (
-    <div className="space-y-6 pb-16">
-      {/* Top Welcome Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white p-6 sm:p-8 rounded-2xl shadow-sm border border-indigo-900/40 relative overflow-hidden">
-        <div className="relative z-10 space-y-1.5">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-primary/20 text-teal-300 border border-teal-400/30">
-              Employee Identity & Profile
-            </span>
-            <span className="text-xs text-indigo-200/80">
-              Creatibuz Studio Member Portal
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            My Info
-          </h1>
-
-          <p className="text-xs sm:text-sm text-indigo-200/80 max-w-xl">
-            View your official ID badge, employment records, compensation share,
-            and update your personal contact details.
-          </p>
-        </div>
-
-        <div className="relative z-10 flex items-center gap-2.5">
-          <button
-            type="button"
-            onClick={() => refetch()}
-            disabled={isFetchingUser}
-            className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all border border-white/15"
-            title="Refresh Details"
-          >
-            <RefreshCw
-              className={`w-4 h-4 ${isFetchingUser ? "animate-spin" : ""}`}
-            />
-          </button>
-        </div>
-      </div>
-
+    <div className="space-y-6 pb-16 pt-2">
       {/* Main Two-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
         {/* =================================================================== */}
         {/* LEFT COLUMN: PIXEL-PERFECT HANGING ID CARD (SAME TO SAME DESIGN)    */}
         {/* =================================================================== */}
@@ -570,10 +535,24 @@ export default function MyInfo() {
                   Verified HR credentials and Finance profit share allocation
                 </p>
               </div>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Active Member
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Active Member
+                </span>
+                <button
+                  type="button"
+                  onClick={() => refetch()}
+                  disabled={isFetchingUser}
+                  className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
+                  title="Refresh Details"
+                >
+                  <RefreshCw
+                    className={`w-3.5 h-3.5 ${isFetchingUser ? "animate-spin" : ""}`}
+                  />
+                </button>
+              </div>
             </div>
+
 
             {/* Employment Metric Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
