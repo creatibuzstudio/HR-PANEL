@@ -10,7 +10,6 @@ import { useDispatch } from "react-redux";
 import { userDetailsFetched } from "@/services/auth/authSlice";
 import { setAuthLocalStorage } from "@/hooks/useLocal";
 import { getTokens, setSessionToken } from "@/hooks/useToken";
-import { printElement } from "@/utils/printHelper";
 import {
   User,
   Mail,
@@ -25,16 +24,10 @@ import {
   Lock,
   Eye,
   EyeOff,
-  Printer,
-  Download,
   CheckCircle2,
-  Sparkles,
   RefreshCw,
-  FileText,
   Save,
   ArrowRight,
-  Crown,
-  Heart,
   Palette,
 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -58,8 +51,8 @@ export default function MyInfo() {
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
   const [uploadImage, { isLoading: isUploadingImage }] = useUploadImageMutation();
 
-  // Background style theme for the hanging ID Card showcase
-  const [cardTheme, setCardTheme] = useState("teal"); // "teal" | "crimson" | "dark"
+  // Background style theme for the hanging ID Card showcase (Default is crimson matching reference image)
+  const [cardTheme, setCardTheme] = useState("crimson"); // "crimson" | "teal" | "dark"
 
   // Form states
   const [name, setName] = useState("");
@@ -73,7 +66,6 @@ export default function MyInfo() {
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
   const fileInputRef = useRef(null);
-  const idBadgeRef = useRef(null);
 
   // Synchronize form when user details are fetched
   useEffect(() => {
@@ -95,15 +87,8 @@ export default function MyInfo() {
       }
       setAvatarFile(file);
       setAvatarPreview(URL.createObjectURL(file));
-      toast.success("Photo selected! Click 'Save Profile Changes' to persist.");
+      toast.success("Photo selected! Click 'Save Profile Changes' to update.");
     }
-  };
-
-  const handlePrintBadge = () => {
-    printElement(
-      idBadgeRef.current || "printable-id-badge",
-      `ID_Badge_${(currentUser.name || "Employee").replace(/\s+/g, "_")}`
-    );
   };
 
   const handleSubmit = async (e) => {
@@ -162,7 +147,6 @@ export default function MyInfo() {
 
       dispatch(userDetailsFetched(fullUpdatedUser));
 
-      // Also persist to storage so refresh retains updated avatar/name
       try {
         const tokens = getTokens();
         if (tokens.accessToken) {
@@ -197,36 +181,23 @@ export default function MyInfo() {
     currentUser.department?.title ||
     "Creatibuz Studio";
 
-  // Themes for the hanging badge backdrop
-  const themeStyles = {
-    teal: {
-      canvas: "bg-gradient-to-br from-[#022c36] via-[#053c48] to-[#01181f]",
-      border: "border-teal-700/40",
-      accent: "text-teal-300",
-      doodleColor: "text-teal-200/90",
-      badgePill: "bg-teal-500/10 text-teal-700 border-teal-500/20",
-    },
-    crimson: {
-      canvas: "bg-gradient-to-br from-[#7a0c1e] via-[#9e1027] to-[#45050f]",
-      border: "border-rose-700/40",
-      accent: "text-rose-200",
-      doodleColor: "text-white/90",
-      badgePill: "bg-rose-500/10 text-rose-700 border-rose-500/20",
-    },
-    dark: {
-      canvas: "bg-gradient-to-br from-[#121316] via-[#1a1c23] to-[#0a0b0d]",
-      border: "border-gray-700/50",
-      accent: "text-indigo-300",
-      doodleColor: "text-gray-200/90",
-      badgePill: "bg-indigo-500/10 text-indigo-700 border-indigo-500/20",
-    },
-  };
-
-  const currentTheme = themeStyles[cardTheme] || themeStyles.teal;
+  // Split name for artistic 2-line handwritten signature (like reference image)
+  const displayName = (name || currentUser.name || "Team Member").trim();
+  const nameParts = displayName.split(" ");
+  const firstLineName =
+    nameParts.length > 2
+      ? nameParts.slice(0, 2).join(" ")
+      : nameParts[0] || displayName;
+  const secondLineName =
+    nameParts.length > 2
+      ? nameParts.slice(2).join(" ")
+      : nameParts.length === 2
+      ? nameParts[1]
+      : "";
 
   return (
     <div className="space-y-6 pb-16">
-      {/* Top Header */}
+      {/* Top Welcome Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white p-6 sm:p-8 rounded-2xl shadow-sm border border-indigo-900/40 relative overflow-hidden">
         <div className="relative z-10 space-y-1.5">
           <div className="flex items-center gap-2">
@@ -238,23 +209,16 @@ export default function MyInfo() {
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            My Info & Official ID Card
+            My Info
           </h1>
+
           <p className="text-xs sm:text-sm text-indigo-200/80 max-w-xl">
-            View your official Creatibuz Studio ID badge, compensation share,
-            assigned department, and update your personal contact details.
+            View your official ID badge, employment records, compensation share,
+            and update your personal contact details.
           </p>
         </div>
 
         <div className="relative z-10 flex items-center gap-2.5">
-          <button
-            type="button"
-            onClick={handlePrintBadge}
-            className="px-4 py-2 text-xs font-bold rounded-xl bg-primary hover:bg-primary/90 text-white shadow-md flex items-center gap-1.5 transition-all"
-          >
-            <Printer className="w-4 h-4" />
-            <span>Print / Save Badge</span>
-          </button>
           <button
             type="button"
             onClick={() => refetch()}
@@ -269,220 +233,314 @@ export default function MyInfo() {
         </div>
       </div>
 
-      {/* Main Grid: Left = Hanging ID Card Showcase | Right = Details & Update Form */}
+      {/* Main Two-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* =================================================================== */}
-        {/* LEFT COLUMN: HANGING ID CARD (EXACT STYLE OF USER'S REFERENCE IMAGE) */}
+        {/* LEFT COLUMN: PIXEL-PERFECT HANGING ID CARD (SAME TO SAME DESIGN)    */}
         {/* =================================================================== */}
-        <div className="lg:col-span-5 xl:col-span-5 space-y-4">
-          {/* Card Showcase Canvas */}
+        <div className="lg:col-span-5 xl:col-span-5 space-y-3">
+          {/* The Textured Canvas Container */}
           <div
-            className={`relative rounded-3xl p-6 sm:p-8 overflow-hidden shadow-2xl border ${currentTheme.canvas} ${currentTheme.border} min-h-[580px] flex flex-col items-center justify-between select-none`}
+            className={`relative rounded-3xl overflow-hidden shadow-2xl border min-h-[580px] sm:min-h-[620px] flex flex-col items-center justify-between p-6 sm:p-8 select-none transition-all duration-300 ${
+              cardTheme === "teal"
+                ? "border-teal-700/50 bg-[#05323e]"
+                : cardTheme === "dark"
+                ? "border-gray-800 bg-[#121316]"
+                : "border-rose-950 bg-[#8c1024]"
+            }`}
             style={{
-              backgroundImage: `radial-gradient(circle at 50% 20%, rgba(255,255,255,0.08) 0%, transparent 65%)`,
+              backgroundImage:
+                cardTheme === "crimson"
+                  ? "url('/crimson-badge-bg.jpg')"
+                  : cardTheme === "teal"
+                  ? "radial-gradient(circle at 50% 30%, #0a4d5e 0%, #03232b 100%)"
+                  : "radial-gradient(circle at 50% 30%, #1f232b 0%, #0a0b0d 100%)",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
             }}
           >
-            {/* Background Texture Overlay */}
-            <div
-              className="absolute inset-0 opacity-15 pointer-events-none mix-blend-overlay"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-              }}
-            />
+            {/* Subtle Textured Vignette Shadow for Realism */}
+            <div className="absolute inset-0 bg-radial from-transparent via-black/10 to-black/30 pointer-events-none" />
 
-            {/* Handwritten Doodles Around Badge (Matching Reference Image) */}
-            {/* Top Left: Welcome To Our Team with Party Popper */}
-            <div className="absolute top-6 left-5 sm:left-6 z-10 pointer-events-none transform -rotate-6">
-              <span
-                className={`font-['Caveat',cursive] text-2xl sm:text-3xl font-bold ${currentTheme.doodleColor} leading-tight drop-shadow-sm block`}
-              >
+            {/* ------------------------------------------------------------- */}
+            {/* 1. TOP-LEFT DOODLES: "Welcome To Our Team" + Party Horn + Arrow */}
+            {/* ------------------------------------------------------------- */}
+            <div className="absolute top-5 sm:top-8 left-4 sm:left-6 z-10 select-none pointer-events-none transform -rotate-6">
+              <h3 className="font-['Caveat',cursive] text-3xl sm:text-4xl lg:text-[40px] font-bold text-white leading-[0.92] drop-shadow-md">
                 Welcome
                 <br />
                 To Our
                 <br />
                 Team
-              </span>
-              <span className="text-xl inline-block mt-0.5 animate-bounce">
-                🎉
-              </span>
-            </div>
+              </h3>
 
-            {/* Top Right: Role Tag with Arrow */}
-            <div className="absolute top-8 right-5 sm:right-6 z-10 pointer-events-none text-right transform rotate-3">
-              <span
-                className={`font-['Caveat',cursive] text-xl sm:text-2xl font-bold ${currentTheme.doodleColor} drop-shadow-sm`}
-              >
-                {designationTitle}
-              </span>
-              {/* Hand-drawn arrow SVG pointing towards the badge */}
-              <div className="flex justify-end mt-1">
+              {/* Red-outlined Party Horn Doodle with 3 Confetti Circles */}
+              <div className="mt-1.5 ml-2">
                 <svg
-                  className="w-10 h-7 text-white/80"
-                  viewBox="0 0 60 40"
+                  className="w-10 h-10 text-red-400 drop-shadow-sm"
+                  viewBox="0 0 36 36"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="2.5"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  {/* Horn body */}
+                  <path d="M6 26 L22 10" stroke="#fca5a5" />
+                  <path d="M4 18 L16 30" stroke="#fca5a5" />
+                  <path d="M4 18 C10 14 18 6 22 10 C26 14 18 22 16 30" stroke="#ef4444" fill="rgba(255,255,255,0.15)" />
+                  <path d="M8 24 L10 21" stroke="#fca5a5" />
+                  <path d="M12 28 L14 25" stroke="#fca5a5" />
+                  {/* Confetti dots */}
+                  <circle cx="28" cy="8" r="1.8" fill="#ffffff" stroke="#ef4444" strokeWidth="1" />
+                  <circle cx="31" cy="15" r="1.8" fill="#ffffff" stroke="#ef4444" strokeWidth="1" />
+                  <circle cx="23" cy="4" r="1.8" fill="#ffffff" stroke="#ef4444" strokeWidth="1" />
+                </svg>
+              </div>
+
+              {/* Curly Hand-drawn Arrow Pointing toward Badge Photo */}
+              <div className="ml-5 -mt-1">
+                <svg
+                  className="w-14 h-12 text-white/95 drop-shadow"
+                  viewBox="0 0 60 50"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
                   strokeLinecap="round"
                 >
-                  <path d="M50,5 C40,25 25,30 5,28 M15,20 L5,28 L15,36" />
+                  <path d="M12 10 C28 8 46 16 42 32 C38 40 26 42 16 38" />
+                  <path d="M24 30 L16 38 L25 45" />
                 </svg>
               </div>
             </div>
 
-            {/* Side Doodle: Handshake outline */}
-            <div className="absolute top-[48%] right-4 z-10 pointer-events-none transform -rotate-12 bg-white/10 backdrop-blur-xs p-2 rounded-xl border border-white/20">
-              <span className="text-xl">🤝</span>
+            {/* ------------------------------------------------------------- */}
+            {/* 2. TOP-RIGHT DOODLES: 4-Petal Flower + Role + Curly Arrow    */}
+            {/* ------------------------------------------------------------- */}
+            <div className="absolute top-5 sm:top-8 right-4 sm:right-6 z-10 select-none pointer-events-none text-right">
+              {/* 4-Petal Flower Doodle */}
+              <div className="flex justify-end mb-1 pr-2">
+                <svg
+                  className="w-7 h-7 text-white drop-shadow-sm"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <circle cx="12" cy="6" r="3.2" />
+                  <circle cx="12" cy="18" r="3.2" />
+                  <circle cx="6" cy="12" r="3.2" />
+                  <circle cx="18" cy="12" r="3.2" />
+                  <circle cx="12" cy="12" r="1.8" fill="#dc2626" />
+                </svg>
+              </div>
+
+              {/* Designation / Role in White Cursive Script with subtle tilt */}
+              <span className="font-['Caveat',cursive] text-2xl sm:text-3xl lg:text-[34px] font-bold text-white drop-shadow-md block transform rotate-3">
+                {designationTitle}
+              </span>
+
+              {/* Curly Hand-drawn Arrow Pointing down-left to the Badge */}
+              <div className="flex justify-end mt-1 pr-1">
+                <svg
+                  className="w-14 h-12 text-white/95 drop-shadow"
+                  viewBox="0 0 60 50"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                >
+                  <path d="M48 10 C34 8 16 16 20 32 C24 40 36 42 45 38" />
+                  <path d="M38 30 L45 38 L37 45" />
+                </svg>
+              </div>
             </div>
 
-            {/* Bottom Doodles: #neverboring & handle */}
+            {/* ------------------------------------------------------------- */}
+            {/* 3. RIGHT SIDE DOODLE: Red & White Handshake Outline Badge     */}
+            {/* ------------------------------------------------------------- */}
+            <div className="absolute top-[48%] right-3 sm:right-5 z-10 select-none pointer-events-none transform -rotate-12">
+              <svg
+                className="w-12 h-12 drop-shadow-md"
+                viewBox="0 0 44 44"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                {/* Badge Outline */}
+                <rect
+                  x="6"
+                  y="8"
+                  width="32"
+                  height="26"
+                  rx="7"
+                  stroke="#ef4444"
+                  strokeWidth="2.5"
+                  fill="#ffffff"
+                />
+                {/* Handshake line art */}
+                <path d="M12 18 L18 24 L22 20 L27 25" stroke="#dc2626" strokeWidth="2.4" />
+                <path d="M18 24 L25 17" stroke="#dc2626" strokeWidth="2.4" />
+                <path d="M10 15 L13 18" stroke="#dc2626" strokeWidth="2.2" />
+                <path d="M30 22 L33 25" stroke="#dc2626" strokeWidth="2.2" />
+                {/* Radiating Spark Lines */}
+                <path d="M3 13 L6 15" stroke="#ffffff" strokeWidth="2" />
+                <path d="M38 13 L41 15" stroke="#ffffff" strokeWidth="2" />
+              </svg>
+            </div>
+
+            {/* ------------------------------------------------------------- */}
+            {/* 4. BOTTOM DOODLES: Pampas Grass Fronds, Hashtag & Handle      */}
+            {/* ------------------------------------------------------------- */}
+            {/* Pampas grass illustration bottom-left */}
+            <div className="absolute bottom-2 left-2 sm:left-4 z-10 pointer-events-none">
+              <svg
+                className="w-24 sm:w-28 h-28 sm:h-32 text-white/70 drop-shadow-xs"
+                viewBox="0 0 80 100"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              >
+                <path d="M10 95 Q35 70 45 20" />
+                <path d="M15 95 Q40 60 60 30" />
+                <path d="M45 20 Q55 15 65 18" />
+                <path d="M42 28 Q55 24 68 28" />
+                <path d="M38 38 Q52 34 65 38" />
+                <path d="M34 48 Q48 45 60 50" />
+                <path d="M30 58 Q45 56 55 62" />
+                <path d="M25 68 Q38 66 48 72" />
+              </svg>
+            </div>
+
             <div className="absolute bottom-4 left-6 z-10 pointer-events-none">
-              <span className="font-mono text-xs tracking-wider text-white/60">
-                #neverboring • #creatibuz
+              <span className="font-mono text-xs font-semibold text-white/85 tracking-wider drop-shadow-sm">
+                #neverboring
               </span>
             </div>
+
             <div className="absolute bottom-4 right-6 z-10 pointer-events-none">
-              <span className="font-mono text-xs tracking-wider text-white/60">
+              <span className="font-mono text-xs font-semibold text-white/85 tracking-wider drop-shadow-sm">
                 @creatibuzstudio
               </span>
             </div>
 
-            {/* TOP METALLIC CLIP (Authentic Lanyard Clamp) */}
-            <div className="relative z-20 flex flex-col items-center -mb-3 pt-1">
-              {/* Metal Hook Loop Ring */}
-              <div className="w-5 h-7 rounded-t-full border-[3px] border-slate-300 dark:border-slate-300 bg-gradient-to-r from-slate-400 via-slate-200 to-slate-400 shadow-sm" />
-              {/* Chrome Metal Alligator Clamp Body */}
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-b from-slate-200 via-slate-300 to-slate-400 border border-slate-400 shadow-md flex items-center justify-center -mt-1 relative z-30">
-                {/* Clamp Screw/Rivet center */}
-                <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 border border-slate-500 shadow-inner flex items-center justify-center">
-                  <div className="w-1.5 h-0.5 bg-slate-300 transform rotate-45" />
-                </div>
+            {/* ------------------------------------------------------------- */}
+            {/* 5. TOP LANYARD STRAP & CHROME METALLIC ALLIGATOR BADGE CLIP   */}
+            {/* ------------------------------------------------------------- */}
+            <div className="relative z-20 flex flex-col items-center -mb-3 pt-0">
+              {/* Black woven fabric lanyard strap extending from top */}
+              <div className="w-8 h-8 bg-gradient-to-b from-[#111] via-[#1f1f1f] to-[#111] border-x border-[#333] shadow-md -mt-8 relative overflow-hidden">
+                {/* Woven strap texture lines */}
+                <div className="absolute inset-0 opacity-20 bg-[repeating-linear-gradient(45deg,#fff,#fff_2px,transparent_2px,transparent_4px)]" />
               </div>
-              {/* Clip clamping tongue extending downward into badge slot */}
-              <div className="w-4 h-4 bg-gradient-to-b from-slate-400 to-slate-600 rounded-b shadow-xs -mt-1 z-30" />
+
+              {/* Curved Metallic Wire Loop Ring */}
+              <div className="w-5 h-6 rounded-t-full border-[3px] border-slate-300 bg-gradient-to-r from-slate-400 via-slate-100 to-slate-400 shadow-sm -mt-0.5" />
+
+              {/* Chrome Metal Clamp Body with Center Round Hole (Exactly like image!) */}
+              <div className="w-10 h-11 rounded-md bg-gradient-to-b from-slate-100 via-slate-300 to-slate-400 border border-slate-400 shadow-xl flex items-center justify-center -mt-1 relative z-30">
+                {/* Shiny chrome highlight line */}
+                <div className="absolute top-1 left-1 right-1 h-[2px] bg-white/80 rounded-full" />
+                {/* Dark Center Circular Hole with metallic rim (Unmistakable detail from the photo!) */}
+                <div className="w-4 h-4 rounded-full bg-[#202731] border-2 border-slate-200 shadow-inner flex items-center justify-center" />
+              </div>
+
+              {/* Lower clamping jaws passing down over the card slot */}
+              <div className="w-5 h-4 bg-gradient-to-b from-slate-400 via-slate-500 to-slate-600 rounded-b shadow-sm -mt-1 z-30" />
             </div>
 
-            {/* THE WHITE LAMINATED ID BADGE */}
+            {/* ------------------------------------------------------------- */}
+            {/* 6. THE WHITE POLAROID ID BADGE CARD (EXACT PURITY & PROPORTION) */}
+            {/* ------------------------------------------------------------- */}
             <div
-              ref={idBadgeRef}
               id="printable-id-badge"
-              className="relative z-20 w-[285px] sm:w-[315px] bg-white rounded-[26px] p-5 pb-6 shadow-2xl border border-gray-100 flex flex-col items-center text-center text-gray-900 transition-transform duration-300 hover:scale-[1.01]"
+              className="relative z-20 w-[275px] sm:w-[310px] bg-white rounded-[32px] p-4 sm:p-5 pt-3 pb-8 shadow-2xl border border-gray-100 flex flex-col items-center text-center text-gray-900 transition-transform duration-300 hover:scale-[1.01]"
             >
-              {/* PUNCHED OVAL SLOT AT TOP OF BADGE */}
-              <div className="w-12 h-3 rounded-full bg-slate-800/80 shadow-inner -mt-1.5 mb-3 border border-slate-900" />
+              {/* Punched Oval Slot at Top of Badge (Through which the clip clamps) */}
+              <div className="w-14 h-3.5 rounded-full bg-[#1b2331] shadow-inner -mt-1 mb-3 border border-slate-800" />
 
-              {/* Creatibuz Studio Logo & Sub-banner */}
-              <div className="w-full flex items-center justify-center gap-1.5 pb-2 border-b border-gray-100">
-                <img
-                  src="/creatibuz-logo.png"
-                  alt="Creatibuz Studio"
-                  className="h-7 w-auto object-contain max-w-[150px]"
-                />
-              </div>
-
-              {/* Photo Frame Container with party hat decoration */}
-              <div className="relative mt-4 mb-3 w-48 h-56 rounded-2xl p-1 bg-gradient-to-b from-gray-100 to-gray-200 shadow-inner flex items-center justify-center overflow-hidden border border-gray-200">
+              {/* Big High-Res Portrait Photo (Clean Polaroid Border, No Clutter) */}
+              <div className="relative w-full aspect-[4/4.1] rounded-2xl bg-gray-100 overflow-hidden shadow-inner border border-gray-100 flex items-center justify-center">
                 {avatarPreview ? (
                   <img
                     src={avatarPreview}
-                    alt={currentUser.name}
-                    className="w-full h-full object-cover rounded-xl"
+                    alt={displayName}
+                    className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full rounded-xl bg-gradient-to-br from-indigo-50 to-teal-50 flex flex-col items-center justify-center text-primary">
+                  <div className="w-full h-full bg-gradient-to-br from-indigo-50 to-teal-50 flex flex-col items-center justify-center text-primary">
                     <User className="w-16 h-16 opacity-40 mb-1" />
                     <span className="text-xs font-semibold text-gray-400">
                       No Photo Added
                     </span>
                   </div>
                 )}
+              </div>
 
-                {/* Subtle Party Popper Doodle on Corner of Photo */}
-                <div className="absolute top-1.5 left-1.5 text-base filter drop-shadow">
-                  🎉
+              {/* Name Area with Red Crown Doodle 👑 */}
+              <div className="relative w-full mt-4 sm:mt-5 text-center">
+                {/* Red Hand-Drawn Crown Doodle 👑 on Top-Right of Name */}
+                <div className="absolute -top-3.5 right-4 sm:right-6 text-red-500 transform rotate-12 pointer-events-none">
+                  <svg
+                    className="w-8 h-6"
+                    viewBox="0 0 32 24"
+                    fill="none"
+                    stroke="#ef4444"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M4 19 L4 8 L10 13 L16 4 L22 13 L28 8 L28 19 Z" />
+                    <path d="M4 19 Q16 21 28 19" />
+                  </svg>
                 </div>
-              </div>
 
-              {/* Crown Doodle 👑 above Name */}
-              <div className="text-rose-500 mb-0.5 animate-pulse">
-                <svg
-                  className="w-7 h-5 mx-auto"
-                  viewBox="0 0 24 16"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M2 14 L4 3 L9 9 L12 2 L15 9 L20 3 L22 14 Z" />
-                </svg>
-              </div>
-
-              {/* Employee Name in Signature/Cursive Typography (like reference image) */}
-              <h2 className="font-['Dancing_Script',cursive] text-2xl sm:text-3xl font-extrabold text-[#11243b] tracking-wide leading-tight px-2">
-                {name || currentUser.name || "Team Member"}
-              </h2>
-
-              {/* Designation & Role Pill */}
-              <div className="mt-1.5 flex flex-wrap items-center justify-center gap-1.5">
-                <span className="px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide bg-teal-50 text-teal-800 border border-teal-200">
-                  {designationTitle}
-                </span>
-              </div>
-
-              {/* Department & Pool Share Badges */}
-              <div className="mt-2 text-xs space-y-1 w-full px-2">
-                <p className="text-gray-500 font-medium">
-                  {departmentName}
-                </p>
-                <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-gray-400">
-                    ID: CBZ-{userId?.slice(-4) || "1001"}
-                  </span>
-                  <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                    {userSalaryShare}% Pool Share
-                  </span>
-                </div>
+                {/* Flowing Dark Blue / Indigo Cursive Script Name (Like Reference Photo) */}
+                <h2 className="font-['Dancing_Script',cursive] text-2xl sm:text-3xl lg:text-[32px] font-extrabold text-[#172554] tracking-wide leading-[1.08] px-2">
+                  <div>{firstLineName}</div>
+                  {secondLineName && <div>{secondLineName}</div>}
+                </h2>
               </div>
             </div>
 
-            {/* Bottom spacer */}
-            <div className="h-4" />
+            {/* Bottom spacer inside canvas */}
+            <div className="h-2" />
           </div>
 
-          {/* Badge Showcase Footer Controls */}
-          <div className="p-4 rounded-2xl bg-white dark:bg-[#181818] border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-            {/* Theme Selector */}
+          {/* Theme Palette Toggle Controls */}
+          <div className="p-3.5 rounded-2xl bg-white dark:bg-[#181818] border border-gray-200 dark:border-gray-800 shadow-sm flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
               <span className="text-gray-500 flex items-center gap-1 font-semibold">
-                <Palette className="w-3.5 h-3.5 text-primary" /> Card Theme:
+                <Palette className="w-3.5 h-3.5 text-primary" /> Badge Canvas Theme:
               </span>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCardTheme("crimson")}
+                  className={`w-5 h-5 rounded-full bg-[#8c1024] border-2 transition-all ${
+                    cardTheme === "crimson"
+                      ? "border-primary scale-110 shadow-sm ring-2 ring-primary/30"
+                      : "border-transparent"
+                  }`}
+                  title="Crimson Classic (Exact Image Match)"
+                />
                 <button
                   type="button"
                   onClick={() => setCardTheme("teal")}
-                  className={`w-5 h-5 rounded-full bg-[#053c48] border-2 transition-all ${
+                  className={`w-5 h-5 rounded-full bg-[#05323e] border-2 transition-all ${
                     cardTheme === "teal"
-                      ? "border-primary scale-110 shadow-sm"
+                      ? "border-primary scale-110 shadow-sm ring-2 ring-primary/30"
                       : "border-transparent"
                   }`}
                   title="Creatibuz Dark Teal"
                 />
                 <button
                   type="button"
-                  onClick={() => setCardTheme("crimson")}
-                  className={`w-5 h-5 rounded-full bg-[#9e1027] border-2 transition-all ${
-                    cardTheme === "crimson"
-                      ? "border-primary scale-110 shadow-sm"
-                      : "border-transparent"
-                  }`}
-                  title="Crimson Classic"
-                />
-                <button
-                  type="button"
                   onClick={() => setCardTheme("dark")}
-                  className={`w-5 h-5 rounded-full bg-[#1a1c23] border-2 transition-all ${
+                  className={`w-5 h-5 rounded-full bg-[#121316] border-2 transition-all ${
                     cardTheme === "dark"
-                      ? "border-primary scale-110 shadow-sm"
+                      ? "border-primary scale-110 shadow-sm ring-2 ring-primary/30"
                       : "border-transparent"
                   }`}
                   title="Midnight Obsidian"
@@ -490,20 +548,14 @@ export default function MyInfo() {
               </div>
             </div>
 
-            {/* Download Button */}
-            <button
-              type="button"
-              onClick={handlePrintBadge}
-              className="px-3.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold flex items-center gap-1.5 transition-all"
-            >
-              <Download className="w-3.5 h-3.5 text-primary" />
-              <span>Download Badge</span>
-            </button>
+            <span className="text-[11px] text-gray-400 font-mono">
+              Live Preview
+            </span>
           </div>
         </div>
 
         {/* =================================================================== */}
-        {/* RIGHT COLUMN: EMPLOYMENT METRICS & EDIT PROFILE FORM */}
+        {/* RIGHT COLUMN: EMPLOYMENT DATA RECORDS & PROFILE UPDATE FORM         */}
         {/* =================================================================== */}
         <div className="lg:col-span-7 xl:col-span-7 space-y-6">
           {/* 1. Official Studio Employment & Compensation Records (Read-Only) */}
@@ -519,7 +571,7 @@ export default function MyInfo() {
                 </p>
               </div>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Active Staff
+                <CheckCircle2 className="w-3.5 h-3.5" /> Active Member
               </span>
             </div>
 
@@ -545,7 +597,7 @@ export default function MyInfo() {
                   to="/my-payslips"
                   className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:underline"
                 >
-                  <span>View Payslip History</span>
+                  <span>View Monthly Payslips</span>
                   <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
@@ -554,7 +606,7 @@ export default function MyInfo() {
               <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/60">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                    Official Designation
+                    Designation
                   </span>
                   <Briefcase className="w-4 h-4 text-indigo-500" />
                 </div>
@@ -563,7 +615,7 @@ export default function MyInfo() {
                     {designationTitle}
                   </div>
                   <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
-                    Assigned by Executive Leadership
+                    Appointed Role in Studio Operations
                   </p>
                 </div>
               </div>
@@ -581,7 +633,7 @@ export default function MyInfo() {
                     {departmentName}
                   </div>
                   <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
-                    Creatibuz Studio Division
+                    Assigned Operational Division
                   </p>
                 </div>
               </div>
@@ -619,22 +671,25 @@ export default function MyInfo() {
                 <span>Update Personal Details</span>
               </h2>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Update your contact details, profile photo, and security password
+                Update your contact details, badge photo, and password
               </p>
             </div>
 
             {/* Photo Upload Section */}
             <div className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-xl bg-gray-50/70 dark:bg-gray-800/40 border border-gray-200/80 dark:border-gray-700/60">
-              <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+              <div
+                className="relative group cursor-pointer"
+                onClick={() => fileInputRef.current?.click()}
+              >
                 {avatarPreview ? (
                   <img
                     src={avatarPreview}
-                    alt={name}
+                    alt={displayName}
                     className="w-16 h-16 rounded-2xl object-cover border-2 border-primary shadow-sm"
                   />
                 ) : (
                   <div className="w-16 h-16 rounded-2xl bg-primary/20 text-primary flex items-center justify-center font-bold text-xl border-2 border-primary/40">
-                    {name?.charAt(0).toUpperCase() || "U"}
+                    {displayName?.charAt(0).toUpperCase() || "U"}
                   </div>
                 )}
                 <div className="absolute inset-0 bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
@@ -644,10 +699,10 @@ export default function MyInfo() {
 
               <div className="space-y-1 text-center sm:text-left flex-1">
                 <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-                  Badge Photo
+                  Badge Portrait Photo
                 </h4>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Recommended square photo (JPG, PNG). Changes reflect on your ID badge instantly.
+                  Select a clear portrait picture. It immediately updates on your ID badge.
                 </p>
                 <div className="flex items-center justify-center sm:justify-start gap-2 pt-1">
                   <input
@@ -662,7 +717,7 @@ export default function MyInfo() {
                     onClick={() => fileInputRef.current?.click()}
                     className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 text-gray-700 dark:text-gray-200 transition-colors"
                   >
-                    Upload New Photo
+                    Select New Photo
                   </button>
                   {avatarFile && (
                     <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">

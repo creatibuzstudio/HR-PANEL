@@ -129,8 +129,9 @@ const AdminNavbar = () => {
                 onClick={() => setShowDropdown(false)}
               >
                 <UserCheck className="w-4 h-4 mr-3 text-primary" />
-                My Info & ID Card
+                My Info
               </Link>
+
 
               <button
                 onClick={handleLogout}
