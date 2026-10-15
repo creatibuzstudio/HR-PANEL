@@ -25,7 +25,7 @@ export const timeTrackerApiSlice = apiSlice.injectEndpoints({
         url: "/time-tracker/active",
         params: { userId },
       }),
-      transformResponse: (res) => res?.data || res,
+      transformResponse: (res) => (res && Object.prototype.hasOwnProperty.call(res, "data") ? res.data : res),
       providesTags: ["TimeTracker"],
     }),
 
@@ -39,13 +39,13 @@ export const timeTrackerApiSlice = apiSlice.injectEndpoints({
           ...(endDate ? { endDate } : {}),
         },
       }),
-      transformResponse: (res) => res?.data || res,
+      transformResponse: (res) => (res && Object.prototype.hasOwnProperty.call(res, "data") ? res.data : res),
       providesTags: ["TimeTracker"],
     }),
 
     getAdminLiveSessions: builder.query({
       query: () => "/time-tracker/admin/live",
-      transformResponse: (res) => res?.data || res,
+      transformResponse: (res) => (res && Object.prototype.hasOwnProperty.call(res, "data") ? res.data : res),
       providesTags: ["TimeTracker"],
     }),
 
@@ -63,7 +63,7 @@ export const timeTrackerApiSlice = apiSlice.injectEndpoints({
           ...(params.status && params.status !== "ALL" ? { status: params.status } : {}),
         },
       }),
-      transformResponse: (res) => res?.data || res,
+      transformResponse: (res) => (res && Object.prototype.hasOwnProperty.call(res, "data") ? res.data : res),
       providesTags: ["TimeTracker"],
     }),
 
@@ -72,7 +72,7 @@ export const timeTrackerApiSlice = apiSlice.injectEndpoints({
         url: "/time-tracker/admin/daily-report",
         params: { ...(date ? { date } : {}) },
       }),
-      transformResponse: (res) => res?.data || res,
+      transformResponse: (res) => (res && Object.prototype.hasOwnProperty.call(res, "data") ? res.data : res),
       providesTags: ["TimeTracker"],
     }),
   }),

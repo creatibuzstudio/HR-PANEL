@@ -44,7 +44,7 @@ import AttendanceStatementModal from "./AttendanceStatementModal";
 
 export default function TimeTracker() {
   const { user: currentUser } = useAuth();
-  const currentUserId = currentUser?.id || currentUser?.userId;
+  const currentUserId = currentUser?.id || currentUser?._id || currentUser?.userId;
 
   // Determine if user has managerial/admin privileges
   const isAdmin = useMemo(() => {
@@ -122,8 +122,12 @@ export default function TimeTracker() {
     { skip: !isAdmin }
   );
 
-  // Active Session & Live Ticking Timer State
-  const activeSession = activeSessionData || myReportData?.activeSession;
+  // Active Session & Live Ticking Timer State (strictly validate status and session id)
+  const rawActive = activeSessionData || myReportData?.activeSession;
+  const activeSession =
+    rawActive && rawActive.id && (rawActive.status === "RUNNING" || (!rawActive.status && rawActive.clockInTime && !rawActive.clockOutTime))
+      ? rawActive
+      : null;
   const [liveElapsedSeconds, setLiveElapsedSeconds] = useState(0);
 
   useEffect(() => {
@@ -171,6 +175,10 @@ export default function TimeTracker() {
 
   // Clock In Action Handler
   const handleClockInSubmit = async ({ photo, note }) => {
+    if (!currentUserId) {
+      toast.error("User ID not loaded yet. Please wait a moment or refresh.");
+      return;
+    }
     try {
       await clockInMutation({
         userId: currentUserId,
@@ -196,6 +204,10 @@ export default function TimeTracker() {
 
   // Clock Out Action Handler
   const handleClockOutSubmit = async ({ photo, note }) => {
+    if (!currentUserId) {
+      toast.error("User ID not loaded yet. Please wait a moment or refresh.");
+      return;
+    }
     try {
       await clockOutMutation({
         userId: currentUserId,
