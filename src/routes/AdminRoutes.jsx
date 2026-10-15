@@ -24,6 +24,7 @@ import FinanceManagement from "@/pages/finance-management/FinanceManagement.jsx"
 import PayrollManagement from "@/pages/payroll/PayrollManagement.jsx";
 import MyPayslips from "@/pages/payroll/MyPayslips.jsx";
 import MyInfo from "@/pages/user/MyInfo.jsx";
+import ActivityLogs from "@/pages/activity-logs/ActivityLogs.jsx";
 
 
 import AdminLogin from "@/pages/auth/Login.jsx";
@@ -140,6 +141,14 @@ export const adminRoutes = [
       {
         path: "my-payslips",
         element: withAdminRoute(MyPayslips),
+      },
+      {
+        path: "activity-logs",
+        element: withAdminRoute(ActivityLogs, [], ["ceo", "coo"]),
+      },
+      {
+        path: "logs",
+        element: withAdminRoute(ActivityLogs, [], ["ceo", "coo"]),
       },
 
 

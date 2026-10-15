@@ -19,6 +19,7 @@ import {
   PieChart,
   Banknote,
   Receipt,
+  History,
 } from "lucide-react";
 import { Permissions } from "@/constants/permissions";
 
@@ -103,6 +104,13 @@ export const adminNavLinks = [
     link: "/invoices",
     icon: FileText,
     allowedRoles: ["ceo", "coo", "hr"],
+  },
+  {
+    id: 22,
+    title: "Activity Logs",
+    link: "/activity-logs",
+    icon: History,
+    allowedRoles: ["ceo", "coo", "hr", "admin"],
   },
   {
     id: 15,
