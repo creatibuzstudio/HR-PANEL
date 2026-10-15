@@ -15,143 +15,193 @@ import {
 } from "lucide-react";
 import moment from "moment";
 import toast from "react-hot-toast";
+import * as faceapi from "@vladmandic/face-api/dist/face-api.esm.js";
+
+let isModelsLoaded = false;
+let modelLoadingPromise = null;
+
+async function loadFaceModels() {
+  if (isModelsLoaded) return true;
+  if (modelLoadingPromise) return modelLoadingPromise;
+
+  modelLoadingPromise = (async () => {
+    const MODEL_URL = "/models";
+    try {
+      await Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+        faceapi.nets.faceLandmark68TinyNet.loadFromUri(MODEL_URL),
+        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+      ]);
+      isModelsLoaded = true;
+      return true;
+    } catch (err) {
+      console.warn("Retrying with standard models:", err);
+      await Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+      ]);
+      isModelsLoaded = true;
+      return true;
+    }
+  })();
+
+  return modelLoadingPromise;
+}
+
+async function loadImageSafe(url) {
+  if (!url) return null;
+  if (url.startsWith("data:")) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = url;
+    });
+  }
+
+  // 1. Attempt fetch with CORS to convert to object URL (guarantees untainted canvas)
+  try {
+    const resp = await fetch(url, { mode: "cors" });
+    if (resp.ok) {
+      const blob = await resp.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = blobUrl;
+      });
+    }
+  } catch {}
+
+  // 2. Fallback: standard Image with anonymous CORS
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = () => {
+      // 3. Fallback: Image without crossOrigin
+      const fallbackImg = new Image();
+      fallbackImg.onload = () => resolve(fallbackImg);
+      fallbackImg.onerror = () => resolve(null);
+      fallbackImg.src = url;
+    };
+    img.src = url;
+  });
+}
+
+async function getDescriptorFromImage(imgElement) {
+  if (!imgElement) return null;
+  await loadFaceModels();
+
+  let detection = await faceapi
+    .detectSingleFace(
+      imgElement,
+      new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.25 })
+    )
+    .withFaceLandmarks(true)
+    .withFaceDescriptor();
+
+  if (!detection) {
+    try {
+      detection = await faceapi
+        .detectSingleFace(
+          imgElement,
+          new faceapi.TinyFaceDetectorOptions({ inputSize: 512, scoreThreshold: 0.15 })
+        )
+        .withFaceLandmarks(true)
+        .withFaceDescriptor();
+    } catch {}
+  }
+
+  // Try SSD MobileNet if Tiny didn't catch the face
+  if (!detection) {
+    try {
+      await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
+      detection = await faceapi
+        .detectSingleFace(imgElement, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.2 }))
+        .withFaceLandmarks(true)
+        .withFaceDescriptor();
+    } catch {}
+  }
+
+  return detection;
+}
 
 /**
- * Compares two images using HTML5 Canvas:
- * 1. Resizes both images to 64x64 on an off-screen canvas.
- * 2. Analyzes color distribution (RGB histogram) & structural luminance cross-correlation.
- * 3. Returns similarity score from 0 to 100%.
+ * Real AI Face Recognition using 128-dimensional Deep Neural Embeddings:
+ * 1. Detects face landmarks for both registered profile photo and webcam snap.
+ * 2. Computes 128-d Euclidean distance between facial biometric vectors.
+ * 3. Distance <= 0.60 corresponds to >= 40% match (Same Person).
+ * 4. Distance > 0.60 corresponds to < 40% match (Different Person - BLOCKED).
  */
 async function calculateFaceSimilarity(registeredImgUrl, capturedDataUrl) {
   if (!registeredImgUrl || registeredImgUrl.includes("ui-avatars.com")) {
-    return { score: 100, isBaseline: true };
+    return { score: 100, isBaseline: true, message: "Baseline face registered" };
   }
 
-  return new Promise((resolve) => {
-    try {
-      const img1 = new Image();
-      const img2 = new Image();
-      img1.crossOrigin = "anonymous";
-      img2.crossOrigin = "anonymous";
+  try {
+    await loadFaceModels();
 
-      let done = false;
-      const finish = (score, isBaseline) => {
-        if (!done) {
-          done = true;
-          resolve({ score, isBaseline });
-        }
+    const [imgRegistered, imgCaptured] = await Promise.all([
+      loadImageSafe(registeredImgUrl),
+      loadImageSafe(capturedDataUrl),
+    ]);
+
+    const [detRegistered, detCaptured] = await Promise.all([
+      getDescriptorFromImage(imgRegistered),
+      getDescriptorFromImage(imgCaptured),
+    ]);
+
+    // 1. Live photo face detection check
+    if (!detCaptured) {
+      return {
+        score: 0,
+        isBaseline: false,
+        error: "No human face detected in the live camera snap. Please position your face clearly in the frame.",
       };
-
-      // Safety timeout in case image cannot load over network
-      const timeout = setTimeout(() => {
-        finish(100, true);
-      }, 4000);
-
-      let loadedCount = 0;
-      const onImageLoad = () => {
-        loadedCount++;
-        if (loadedCount === 2) {
-          clearTimeout(timeout);
-          try {
-            const size = 64;
-            const canvas1 = document.createElement("canvas");
-            canvas1.width = size;
-            canvas1.height = size;
-            const ctx1 = canvas1.getContext("2d", { willReadFrequently: true });
-            ctx1.drawImage(img1, 0, 0, size, size);
-            const d1 = ctx1.getImageData(0, 0, size, size).data;
-
-            const canvas2 = document.createElement("canvas");
-            canvas2.width = size;
-            canvas2.height = size;
-            const ctx2 = canvas2.getContext("2d", { willReadFrequently: true });
-            ctx2.drawImage(img2, 0, 0, size, size);
-            const d2 = ctx2.getImageData(0, 0, size, size).data;
-
-            const bins = 32;
-            const hist1 = new Float32Array(bins * 3);
-            const hist2 = new Float32Array(bins * 3);
-            const totalPixels = size * size;
-
-            const lum1 = new Float32Array(totalPixels);
-            const lum2 = new Float32Array(totalPixels);
-
-            let sumLum1 = 0;
-            let sumLum2 = 0;
-
-            for (let i = 0; i < totalPixels; i++) {
-              const r1 = d1[i * 4];
-              const g1 = d1[i * 4 + 1];
-              const b1 = d1[i * 4 + 2];
-
-              const r2 = d2[i * 4];
-              const g2 = d2[i * 4 + 1];
-              const b2 = d2[i * 4 + 2];
-
-              hist1[Math.floor((r1 / 256) * bins)]++;
-              hist1[bins + Math.floor((g1 / 256) * bins)]++;
-              hist1[bins * 2 + Math.floor((b1 / 256) * bins)]++;
-
-              hist2[Math.floor((r2 / 256) * bins)]++;
-              hist2[bins + Math.floor((g2 / 256) * bins)]++;
-              hist2[bins * 2 + Math.floor((b2 / 256) * bins)]++;
-
-              const l1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1;
-              const l2 = 0.299 * r2 + 0.587 * g2 + 0.114 * b2;
-              lum1[i] = l1;
-              lum2[i] = l2;
-              sumLum1 += l1;
-              sumLum2 += l2;
-            }
-
-            let histIntersection = 0;
-            const totalHistCount = totalPixels * 3;
-            for (let k = 0; k < bins * 3; k++) {
-              histIntersection += Math.min(hist1[k], hist2[k]);
-            }
-            const colorScore = histIntersection / totalHistCount;
-
-            const mean1 = sumLum1 / totalPixels;
-            const mean2 = sumLum2 / totalPixels;
-
-            let numerator = 0;
-            let denom1 = 0;
-            let denom2 = 0;
-
-            for (let i = 0; i < totalPixels; i++) {
-              const diff1 = lum1[i] - mean1;
-              const diff2 = lum2[i] - mean2;
-              numerator += diff1 * diff2;
-              denom1 += diff1 * diff1;
-              denom2 += diff2 * diff2;
-            }
-
-            const denominator = Math.sqrt(denom1 * denom2);
-            let ncc = denominator > 0 ? numerator / denominator : 0;
-            const nccNormalized = Math.max(0, Math.min(1, (ncc + 1) / 2));
-
-            // Combined similarity: 40% color histogram + 60% structural luminance
-            const combined = colorScore * 0.4 + nccNormalized * 0.6;
-            const finalScore = Math.max(5, Math.min(99, Math.round(combined * 100)));
-
-            finish(finalScore, false);
-          } catch {
-            finish(100, true);
-          }
-        }
-      };
-
-      img1.onload = onImageLoad;
-      img2.onload = onImageLoad;
-      img1.onerror = () => finish(100, true);
-      img2.onerror = () => finish(100, true);
-
-      img1.src = registeredImgUrl;
-      img2.src = capturedDataUrl;
-    } catch {
-      resolve({ score: 100, isBaseline: true });
     }
-  });
+
+    // 2. Registered photo face detection check
+    if (!detRegistered) {
+      return {
+        score: 100,
+        isBaseline: true,
+        message: "No human face found in old profile picture. Registering this face as new benchmark.",
+      };
+    }
+
+    // 3. Compute real 128-dimensional Euclidean distance
+    const distance = faceapi.euclideanDistance(
+      detRegistered.descriptor,
+      detCaptured.descriptor
+    );
+
+    // Standard FaceNet/ResNet Euclidean distance mapping:
+    // Distance 0.0 -> 100% match
+    // Distance <= 0.60 -> >= 40% match (Official Pass Threshold)
+    // Distance >= 0.80 -> 0% match (Completely different person)
+    let score = 0;
+    if (distance <= 0.60) {
+      score = Math.round(100 - (distance / 0.60) * 60);
+    } else {
+      score = Math.max(0, Math.round(40 - ((distance - 0.60) / 0.20) * 40));
+    }
+
+    return {
+      score,
+      distance: Number(distance.toFixed(3)),
+      isBaseline: false,
+    };
+  } catch (err) {
+    console.error("Face similarity calculation error:", err);
+    return {
+      score: 0,
+      isBaseline: false,
+      error: "Facial analysis error. Please retake the photo.",
+    };
+  }
 }
 
 export default function WebcamCaptureModal({
@@ -238,6 +288,7 @@ export default function WebcamCaptureModal({
     if (isOpen) {
       startCamera();
       setNote("");
+      loadFaceModels(); // Warm up AI models in background
     } else {
       stopStream();
       setCapturedPhoto(null);
@@ -254,6 +305,16 @@ export default function WebcamCaptureModal({
     setMatchResult({ score: null, isBaseline: false, isAnalyzing: true });
     try {
       const res = await calculateFaceSimilarity(userPicture, dataUrl);
+      if (res.error) {
+        setMatchResult({
+          score: 0,
+          isBaseline: false,
+          isAnalyzing: false,
+        });
+        toast.error(res.error, { duration: 4000 });
+        return;
+      }
+
       setMatchResult({
         score: res.score,
         isBaseline: res.isBaseline,
@@ -262,14 +323,15 @@ export default function WebcamCaptureModal({
 
       if (!res.isBaseline && res.score < 40) {
         toast.error(
-          `Face match (${res.score}%) is below the mandatory 40% threshold. Please retake the photo.`,
+          `Face match (${res.score}%) is below the mandatory 40% threshold. Verification failed.`,
           { duration: 4000 }
         );
       } else if (!res.isBaseline && res.score >= 40) {
         toast.success(`Face match verified: ${res.score}% (Required >= 40%)`);
       }
     } catch {
-      setMatchResult({ score: 100, isBaseline: true, isAnalyzing: false });
+      setMatchResult({ score: 0, isBaseline: false, isAnalyzing: false });
+      toast.error("Facial verification failed. Please try again.");
     }
   };
 
