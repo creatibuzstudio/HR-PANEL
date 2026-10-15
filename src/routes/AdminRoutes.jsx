@@ -75,47 +75,51 @@ export const adminRoutes = [
       },
       {
         path: "blogs",
-        element: withAdminRoute(BlogManagement, [], ["ceo", "coo", "hr"]),
+        element: withAdminRoute(BlogManagement, [], ["ceo", "coo", "hr", "developer"]),
       },
       {
         path: "case-studies",
-        element: withAdminRoute(CaseStudyManagement, [], ["ceo", "coo", "hr"]),
+        element: withAdminRoute(CaseStudyManagement, [], ["ceo", "coo", "hr", "developer"]),
       },
       {
         path: "case-studies/create",
-        element: withAdminRoute(CreateCaseStudy),
+        element: withAdminRoute(CreateCaseStudy, [], ["ceo", "coo", "hr", "developer"]),
       },
       {
         path: "case-studies/edit/:id",
-        element: withAdminRoute(EditCaseStudy),
+        element: withAdminRoute(EditCaseStudy, [], ["ceo", "coo", "hr", "developer"]),
       },
       {
         path: "casestudies",
-        element: withAdminRoute(CaseStudyManagement),
+        element: withAdminRoute(CaseStudyManagement, [], ["ceo", "coo", "hr", "developer"]),
       },
       {
         path: "casestudies/create",
-        element: withAdminRoute(CreateCaseStudy),
+        element: withAdminRoute(CreateCaseStudy, [], ["ceo", "coo", "hr", "developer"]),
       },
       {
         path: "casestudies/edit/:id",
-        element: withAdminRoute(EditCaseStudy),
+        element: withAdminRoute(EditCaseStudy, [], ["ceo", "coo", "hr", "developer"]),
       },
       {
         path: "categories",
-        element: withAdminRoute(CategoryManagement),
+        element: withAdminRoute(CategoryManagement, [], ["ceo", "coo", "hr", "developer"]),
+      },
+      {
+        path: "my-info",
+        element: withAdminRoute(MyInfo),
       },
       {
         path: "settings/categories",
-        element: withAdminRoute(CategoryManagement),
+        element: withAdminRoute(CategoryManagement, [], ["ceo", "coo", "hr", "developer"]),
       },
       {
         path: "package-categories",
-        element: withAdminRoute(PackageCategoryManagement),
+        element: withAdminRoute(PackageCategoryManagement, [], ["ceo", "coo", "hr", "developer"]),
       },
       {
         path: "settings/package-categories",
-        element: withAdminRoute(PackageCategoryManagement),
+        element: withAdminRoute(PackageCategoryManagement, [], ["ceo", "coo", "hr", "developer"]),
       },
       {
         path: "products",
@@ -137,10 +141,7 @@ export const adminRoutes = [
         path: "my-payslips",
         element: withAdminRoute(MyPayslips),
       },
-      {
-        path: "my-info",
-        element: withAdminRoute(MyInfo),
-      },
+
 
 
       {
