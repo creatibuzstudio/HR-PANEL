@@ -452,11 +452,10 @@ export default function Dashboard() {
                 <button
                   type="button"
                   onClick={() => setActiveChartTab("revenue")}
-                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors ${
-                    activeChartTab === "revenue"
-                      ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs"
-                      : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
-                  }`}
+                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors ${activeChartTab === "revenue"
+                    ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                    }`}
                 >
                   Revenue Flow ($)
                 </button>
@@ -464,11 +463,10 @@ export default function Dashboard() {
               <button
                 type="button"
                 onClick={() => setActiveChartTab("orders")}
-                className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors ${
-                  activeChartTab === "orders" || !isExecutive
-                    ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
-                }`}
+                className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors ${activeChartTab === "orders" || !isExecutive
+                  ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-xs"
+                  : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                  }`}
               >
                 Order Volume
               </button>
@@ -648,11 +646,10 @@ export default function Dashboard() {
                 upcomingBirthdays.map((item) => (
                   <div
                     key={item.id}
-                    className={`py-3 flex items-center justify-between gap-3 transition-colors rounded-xl px-2.5 ${
-                      item.isToday
-                        ? "bg-gradient-to-r from-pink-500/10 via-rose-500/10 to-transparent border border-pink-500/30 shadow-sm"
-                        : "hover:bg-gray-50/70 dark:hover:bg-gray-800/30"
-                    }`}
+                    className={`py-3 flex items-center justify-between gap-3 transition-colors rounded-xl px-2.5 ${item.isToday
+                      ? "bg-gradient-to-r from-pink-500/10 via-rose-500/10 to-transparent border border-pink-500/30 shadow-sm"
+                      : "hover:bg-gray-50/70 dark:hover:bg-gray-800/30"
+                      }`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="relative">
@@ -681,9 +678,7 @@ export default function Dashboard() {
                       <div className="min-w-0">
                         <div className="font-bold text-sm text-gray-900 dark:text-white truncate flex items-center gap-1.5">
                           {item.name}
-                          <span className="capitalize text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
-                            {item.role}
-                          </span>
+
                         </div>
                         <div className="text-xs text-gray-500 truncate">
                           {item.designation} • {item.department}
@@ -697,13 +692,12 @@ export default function Dashboard() {
                         {item.formattedDate}
                       </div>
                       <span
-                        className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[11px] font-bold ${
-                          item.isToday
-                            ? "bg-pink-500 text-white animate-pulse shadow-sm"
-                            : item.daysRemaining === 1
+                        className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[11px] font-bold ${item.isToday
+                          ? "bg-pink-500 text-white animate-pulse shadow-sm"
+                          : item.daysRemaining === 1
                             ? "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700"
                             : "bg-pink-100 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300"
-                        }`}
+                          }`}
                       >
                         {item.statusText}
                       </span>
@@ -811,9 +805,7 @@ export default function Dashboard() {
                       <div className="min-w-0">
                         <div className="font-bold text-sm text-gray-900 dark:text-white truncate flex items-center gap-1.5">
                           {item.name}
-                          <span className="capitalize text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                            {item.role}
-                          </span>
+
                         </div>
                         <div className="text-xs text-gray-500 truncate">
                           {item.designation} • {item.department}
