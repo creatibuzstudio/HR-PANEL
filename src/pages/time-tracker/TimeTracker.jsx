@@ -84,9 +84,13 @@ export default function TimeTracker() {
   // Statement Report Modal State
   const [isStatementModalOpen, setIsStatementModalOpen] = useState(false);
 
+  // Executive Delete Modal State
+  const [deleteSessionId, setDeleteSessionId] = useState(null);
+
   // API Mutations
   const [clockInMutation, { isLoading: isClockingIn }] = useClockInMutation();
   const [clockOutMutation, { isLoading: isClockingOut }] = useClockOutMutation();
+  const [deleteSessionMutation, { isLoading: isDeletingSession }] = useDeleteSessionMutation();
 
   // API Queries
   const {
@@ -235,6 +239,29 @@ export default function TimeTracker() {
       }
     } catch (err) {
       toast.error(err?.data?.message || err?.message || "Failed to clock out");
+    }
+  };
+
+  // Executive Delete Session Handler (CEO & COO)
+  const handleOpenDelete = (sessionId) => {
+    setDeleteSessionId(sessionId);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteSessionId) return;
+    try {
+      await deleteSessionMutation(deleteSessionId).unwrap();
+      toast.success("Time tracking session deleted successfully");
+      setDeleteSessionId(null);
+      refetchActive();
+      refetchMyReport();
+      if (isAdmin) {
+        refetchAdminLive();
+        refetchAdminDaily();
+        refetchAdminAll();
+      }
+    } catch (err) {
+      toast.error(err?.data?.message || err?.message || "Failed to delete session");
     }
   };
 
@@ -600,12 +627,13 @@ export default function TimeTracker() {
                     <th className="px-5 py-3">Duration</th>
                     <th className="px-5 py-3">Status</th>
                     <th className="px-5 py-3">Work Summary / Note</th>
+                    {isExecutive && <th className="px-5 py-3 text-right">Actions</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-xs">
                   {(myReportData?.sessions || []).length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-10 text-center text-gray-400">
+                      <td colSpan={isExecutive ? 7 : 6} className="py-10 text-center text-gray-400">
                         No work sessions logged yet today. Click "Start Shift with Camera" above to begin.
                       </td>
                     </tr>
@@ -721,6 +749,20 @@ export default function TimeTracker() {
                         <td className="px-5 py-3.5 text-gray-600 dark:text-gray-400 max-w-xs truncate">
                           {session.note || "Standard daily development work"}
                         </td>
+
+                        {/* Executive Delete Button (CEO / COO Only) */}
+                        {isExecutive && (
+                          <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenDelete(session.id)}
+                              className="p-1.5 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                              title="Delete Session (CEO / COO Only)"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
+                        )}
                       </tr>
                     ))
                   )}
@@ -1143,12 +1185,13 @@ export default function TimeTracker() {
                     <th className="px-5 py-3">Duration</th>
                     <th className="px-5 py-3">Status</th>
                     <th className="px-5 py-3">Notes</th>
+                    {isExecutive && <th className="px-5 py-3 text-right">Actions</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-xs">
                   {(adminAllSessionsData?.sessions || []).length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-10 text-center text-gray-400">
+                      <td colSpan={isExecutive ? 7 : 6} className="py-10 text-center text-gray-400">
                         No work sessions found matching the query.
                       </td>
                     </tr>
@@ -1262,6 +1305,20 @@ export default function TimeTracker() {
                         <td className="px-5 py-3.5 text-gray-500 max-w-xs truncate" title={session.note}>
                           {session.note || "—"}
                         </td>
+
+                        {/* Executive Delete Action (CEO / COO Only) */}
+                        {isExecutive && (
+                          <td className="px-5 py-3.5 text-right whitespace-nowrap">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenDelete(session.id)}
+                              className="p-1.5 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                              title="Delete Session (CEO / COO Only)"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
+                        )}
                       </tr>
                     ))
                   )}
@@ -1296,6 +1353,16 @@ export default function TimeTracker() {
         reportData={adminDailyReportData}
         targetDate={selectedDate}
         currentUser={currentUser}
+      />
+
+      {/* Delete Confirmation Modal (CEO / COO Only) */}
+      <DeleteConfirmModal
+        isOpen={!!deleteSessionId}
+        onClose={() => setDeleteSessionId(null)}
+        onConfirm={handleConfirmDelete}
+        count={1}
+        itemName="work tracking session"
+        loading={isDeletingSession}
       />
     </div>
   );
