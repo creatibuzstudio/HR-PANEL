@@ -187,7 +187,7 @@ export default function TimeTracker() {
   };
 
   // Clock In Action Handler
-  const handleClockInSubmit = async ({ photo, note }) => {
+  const handleClockInSubmit = async ({ photo, note, faceMatchScore }) => {
     if (!currentUserId) {
       toast.error("User ID not loaded yet. Please wait a moment or refresh.");
       return;
@@ -198,8 +198,10 @@ export default function TimeTracker() {
         userName: currentUser?.name || currentUser?.nameEn || "Team Member",
         userEmail: currentUser?.email,
         userRole: currentUser?.role || "employee",
+        userPicture: currentUser?.picture || null,
         photo,
         note,
+        faceMatchScore,
       }).unwrap();
 
       toast.success("Shift successfully started with camera verification!");
@@ -216,7 +218,7 @@ export default function TimeTracker() {
   };
 
   // Clock Out Action Handler
-  const handleClockOutSubmit = async ({ photo, note }) => {
+  const handleClockOutSubmit = async ({ photo, note, faceMatchScore }) => {
     if (!currentUserId) {
       toast.error("User ID not loaded yet. Please wait a moment or refresh.");
       return;
@@ -227,6 +229,7 @@ export default function TimeTracker() {
         sessionId: activeSession?.id,
         photo,
         note,
+        faceMatchScore,
       }).unwrap();
 
       toast.success("Shift ended and attendance session logged successfully!");
@@ -658,6 +661,7 @@ export default function TimeTracker() {
                                     timestamp: session.clockInTime,
                                     note: session.note,
                                     date: session.date,
+                                    faceMatchScore: session.faceMatchScore,
                                   })
                                 }
                                 className="w-10 h-10 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 hover:ring-2 hover:ring-primary transition-all flex-shrink-0 cursor-pointer"
@@ -675,7 +679,7 @@ export default function TimeTracker() {
                                 {moment(session.clockInTime).format("hh:mm A")}
                               </span>
                               <span className="text-[10px] text-emerald-600 font-semibold">
-                                ✓ Verified
+                                ✓ Verified ({session.faceMatchScore || 100}%)
                               </span>
                             </div>
                           </div>
@@ -696,6 +700,7 @@ export default function TimeTracker() {
                                       timestamp: session.clockOutTime,
                                       note: session.note,
                                       date: session.date,
+                                      faceMatchScore: session.faceMatchScore,
                                     })
                                   }
                                   className="w-10 h-10 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700 hover:ring-2 hover:ring-purple-500 transition-all flex-shrink-0 cursor-pointer"
@@ -1335,6 +1340,7 @@ export default function TimeTracker() {
         onClose={() => setIsCameraModalOpen(false)}
         type={cameraModalType}
         userName={currentUser?.name || "Employee"}
+        userPicture={currentUser?.picture || currentUser?.avatar || ""}
         onSubmit={cameraModalType === "CLOCK_IN" ? handleClockInSubmit : handleClockOutSubmit}
         isSubmitting={isClockingIn || isClockingOut}
       />

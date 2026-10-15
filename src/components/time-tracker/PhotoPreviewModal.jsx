@@ -59,6 +59,14 @@ export default function PhotoPreviewModal({ isOpen, onClose, data }) {
               {data.date || moment().format("YYYY-MM-DD")}
             </span>
           </div>
+
+          <div className="col-span-2 pt-2 border-t dark:border-gray-800 flex items-center justify-between">
+            <span className="text-gray-400 text-[10px] uppercase font-bold">Dashboard Face Match Score</span>
+            <span className="font-bold text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              {data.faceMatchScore ? `${data.faceMatchScore}% Match (Min 40% Quota Passed)` : "Verified"}
+            </span>
+          </div>
         </div>
 
         {data.note && (
