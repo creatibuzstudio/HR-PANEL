@@ -25,6 +25,7 @@ import PayrollManagement from "@/pages/payroll/PayrollManagement.jsx";
 import MyPayslips from "@/pages/payroll/MyPayslips.jsx";
 import MyInfo from "@/pages/user/MyInfo.jsx";
 import ActivityLogs from "@/pages/activity-logs/ActivityLogs.jsx";
+import TimeTracker from "@/pages/time-tracker/TimeTracker.jsx";
 
 
 import AdminLogin from "@/pages/auth/Login.jsx";
@@ -149,6 +150,14 @@ export const adminRoutes = [
       {
         path: "logs",
         element: withAdminRoute(ActivityLogs, [], ["ceo", "coo"]),
+      },
+      {
+        path: "time-tracker",
+        element: withAdminRoute(TimeTracker),
+      },
+      {
+        path: "attendance",
+        element: withAdminRoute(TimeTracker),
       },
 
 

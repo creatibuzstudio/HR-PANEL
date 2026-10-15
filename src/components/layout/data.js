@@ -20,6 +20,7 @@ import {
   Banknote,
   Receipt,
   History,
+  Clock,
 } from "lucide-react";
 import { Permissions } from "@/constants/permissions";
 
@@ -30,6 +31,13 @@ export const adminNavLinks = [
     title: "Dashboard",
     link: "/",
     icon: LayoutDashboard,
+    requiredPermissions: [],
+  },
+  {
+    id: 23,
+    title: "Time & Attendance",
+    link: "/time-tracker",
+    icon: Clock,
     requiredPermissions: [],
   },
   {
