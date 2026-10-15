@@ -24,6 +24,7 @@ import {
   Globe,
   SlidersHorizontal,
   RotateCcw,
+  Trash2,
 } from "lucide-react";
 import moment from "moment";
 import * as XLSX from "xlsx";
@@ -32,6 +33,7 @@ import useAuth from "@/hooks/useAuth";
 import {
   useClockInMutation,
   useClockOutMutation,
+  useDeleteSessionMutation,
   useGetActiveSessionQuery,
   useGetMyWorkReportQuery,
   useGetAdminLiveSessionsQuery,
@@ -41,6 +43,7 @@ import {
 import WebcamCaptureModal from "@/components/time-tracker/WebcamCaptureModal";
 import PhotoPreviewModal from "@/components/time-tracker/PhotoPreviewModal";
 import AttendanceStatementModal from "./AttendanceStatementModal";
+import DeleteConfirmModal from "@/components/ui/modal/DeleteConfirmModal.jsx";
 
 export default function TimeTracker() {
   const { user: currentUser } = useAuth();
@@ -50,6 +53,12 @@ export default function TimeTracker() {
   const isAdmin = useMemo(() => {
     const role = (currentUser?.role || currentUser?.type || "").toLowerCase();
     return ["ceo", "coo", "hr", "admin"].includes(role);
+  }, [currentUser]);
+
+  // Executive privileges: only CEO and COO can delete sessions
+  const isExecutive = useMemo(() => {
+    const role = (currentUser?.role || currentUser?.type || "").toLowerCase();
+    return ["ceo", "coo"].includes(role);
   }, [currentUser]);
 
   // Tab State: for admins, options are "LIVE" | "DAILY_REPORT" | "ALL_SESSIONS" | "MY_SHIFT"

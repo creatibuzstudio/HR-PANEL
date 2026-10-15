@@ -20,6 +20,14 @@ export const timeTrackerApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ["TimeTracker"],
     }),
 
+    deleteSession: builder.mutation({
+      query: (id) => ({
+        url: `/time-tracker/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["TimeTracker"],
+    }),
+
     getActiveSession: builder.query({
       query: (userId) => ({
         url: "/time-tracker/active",
@@ -81,6 +89,7 @@ export const timeTrackerApiSlice = apiSlice.injectEndpoints({
 export const {
   useClockInMutation,
   useClockOutMutation,
+  useDeleteSessionMutation,
   useGetActiveSessionQuery,
   useGetMyWorkReportQuery,
   useGetAdminLiveSessionsQuery,
