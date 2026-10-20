@@ -40,6 +40,7 @@ const schema = yup.object({
 });
 
 const ROLE_OPTIONS = [
+  { value: "user", label: "User" },
   { value: "admin", label: "Admin" },
   { value: "hr", label: "HR" },
   { value: "developer", label: "Developer" },
