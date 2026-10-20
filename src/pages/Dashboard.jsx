@@ -30,6 +30,11 @@ import {
   UserPlus,
   Calendar,
   Share2,
+  Eye,
+  Globe,
+  BookOpen,
+  Flame,
+  ExternalLink,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import {
@@ -83,6 +88,15 @@ export default function Dashboard() {
   const totalBlogs = Number(overview.totalBlogs || 0);
   const totalCaseStudies = Number(overview.totalCaseStudies || 0);
 
+  // Live Website & Blog Visitors Telemetry
+  const totalWebsiteVisitors = Number(overview.totalWebsiteVisitors || statsData?.totalWebsiteVisitors || 0);
+  const todayWebsiteVisitors = Number(overview.todayWebsiteVisitors || statsData?.todayWebsiteVisitors || 0);
+  const totalBlogReaders = Number(overview.totalBlogReaders || statsData?.totalBlogReaders || 0);
+  const todayBlogVisitors = Number(overview.todayBlogVisitors || statsData?.todayBlogVisitors || 0);
+  const uniqueVisitorsCount = Number(overview.uniqueVisitorsCount || statsData?.uniqueVisitorsCount || 0);
+  const topViewedBlogs = overview.topViewedBlogs || statsData?.topViewedBlogs || [];
+  const visitorTrend = charts.visitorTrend || statsData?.visitorTrend || [];
+
   const pools = overview.pools || {};
   const leadershipPool = pools.leadershipPool || {};
 
@@ -122,6 +136,34 @@ export default function Dashboard() {
                 {entry.name.toLowerCase().includes("order")
                   ? entry.value
                   : `$${Number(entry.value).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+              </span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const CustomVisitorTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-3 rounded-xl shadow-xl text-xs space-y-1.5 min-w-[170px]">
+          <p className="font-bold text-gray-900 dark:text-white border-b dark:border-gray-800 pb-1 flex items-center justify-between">
+            <span>{label} Traffic</span>
+            <span className="text-[10px] text-gray-400 font-normal">Daily</span>
+          </p>
+          {payload.map((entry, index) => (
+            <div key={`vis-item-${index}`} className="flex justify-between items-center gap-3">
+              <span className="flex items-center gap-1.5 text-gray-500">
+                <span
+                  className="w-2.5 h-2.5 rounded-full inline-block"
+                  style={{ backgroundColor: entry.color }}
+                />
+                {entry.name}:
+              </span>
+              <span className="font-mono font-bold text-gray-900 dark:text-white">
+                {entry.value} {entry.value === 1 ? "visitor" : "visitors"}
               </span>
             </div>
           ))}
@@ -433,6 +475,121 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Live Website Traffic & Blog Readership Telemetry Bar */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Total Website Visitors */}
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-50/80 via-white to-sky-50/40 dark:from-blue-950/20 dark:via-[#1a191b] dark:to-sky-950/10 border border-blue-200/80 dark:border-blue-900/50 shadow-sm relative overflow-hidden group hover:border-blue-400 dark:hover:border-blue-700 transition-all">
+          <div className="flex justify-between items-start">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-wider">
+                  Total Website Visitors
+                </span>
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+              </div>
+              <h3 className="text-3xl font-mono font-bold text-gray-900 dark:text-white mt-1.5">
+                {totalWebsiteVisitors.toLocaleString()}
+              </h3>
+            </div>
+            <div className="p-2.5 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 group-hover:scale-110 transition-transform">
+              <Globe className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="flex items-center justify-between text-xs text-gray-500 mt-3 pt-2.5 border-t border-blue-100 dark:border-gray-800">
+            <span className="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
+              <ArrowUpRight className="w-3.5 h-3.5" />
+              +{todayWebsiteVisitors} today
+            </span>
+            <span className="text-gray-400">
+              {uniqueVisitorsCount} Unique IPs
+            </span>
+          </div>
+        </div>
+
+        {/* Card 2: Blog Readership & View Count */}
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-50/80 via-white to-orange-50/40 dark:from-amber-950/20 dark:via-[#1a191b] dark:to-orange-950/10 border border-amber-200/80 dark:border-amber-900/50 shadow-sm relative overflow-hidden group hover:border-amber-400 dark:hover:border-amber-700 transition-all">
+          <div className="flex justify-between items-start">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
+                  Blog Readers & Views
+                </span>
+                <Flame className="w-3.5 h-3.5 text-orange-500" />
+              </div>
+              <h3 className="text-3xl font-mono font-bold text-gray-900 dark:text-white mt-1.5">
+                {totalBlogReaders.toLocaleString()}
+              </h3>
+            </div>
+            <div className="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300 group-hover:scale-110 transition-transform">
+              <BookOpen className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="flex items-center justify-between text-xs text-gray-500 mt-3 pt-2.5 border-t border-amber-100 dark:border-gray-800">
+            <span className="inline-flex items-center gap-1 font-medium text-amber-600 dark:text-amber-400">
+              <ArrowUpRight className="w-3.5 h-3.5" />
+              +{todayBlogVisitors} today
+            </span>
+            <span className="text-gray-400">
+              {totalBlogs} Published Posts
+            </span>
+          </div>
+        </div>
+
+        {/* Card 3: Readership Conversion Ratio */}
+        <div className="p-5 rounded-2xl bg-white dark:bg-[#1a191b] border border-gray-200 dark:border-gray-800 shadow-sm relative overflow-hidden group hover:border-emerald-400 dark:hover:border-emerald-700 transition-all">
+          <div className="flex justify-between items-start">
+            <div>
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Readership Ratio
+              </span>
+              <h3 className="text-3xl font-mono font-bold text-gray-900 dark:text-white mt-1.5">
+                {totalWebsiteVisitors > 0 ? ((totalBlogReaders / totalWebsiteVisitors) * 100).toFixed(1) : 0}%
+              </h3>
+            </div>
+            <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+              <Eye className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="flex items-center justify-between text-xs text-gray-500 mt-3 pt-2.5 border-t dark:border-gray-800">
+            <span>Website traffic reading blogs</span>
+            <span className="text-emerald-600 font-medium">Reader Engagement</span>
+          </div>
+        </div>
+
+        {/* Card 4: Most Read Blog Quick Preview */}
+        <div className="p-5 rounded-2xl bg-white dark:bg-[#1a191b] border border-gray-200 dark:border-gray-800 shadow-sm relative overflow-hidden group hover:border-purple-400 dark:hover:border-purple-700 transition-all">
+          <div className="flex justify-between items-start">
+            <div className="truncate mr-2">
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Most Read Article
+              </span>
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-white mt-1.5 truncate" title={topViewedBlogs[0]?.title || "No blog posts yet"}>
+                {topViewedBlogs[0]?.title || "No blog posts yet"}
+              </h4>
+            </div>
+            <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 shrink-0">
+              <Flame className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="flex items-center justify-between text-xs text-gray-500 mt-3 pt-2.5 border-t dark:border-gray-800">
+            <span className="font-mono text-purple-600 dark:text-purple-400 font-bold">
+              {topViewedBlogs[0]?.views || 0} views
+            </span>
+            <a
+              href={topViewedBlogs[0]?.slug ? `https://creatibuzstudio.com/blogs/${topViewedBlogs[0]?.slug}` : "#"}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+            >
+              Read Live <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Main Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Left: Revenue & Orders Inflow Trends Chart */}
@@ -582,6 +739,153 @@ export default function Dashboard() {
                 <span className="font-bold text-gray-900 dark:text-white">{item.value} order(s)</span>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Website Traffic & Blog Readership Analytics */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        {/* Left: 7-Day Visitor Traffic vs Blog Readership Trend */}
+        <div className="lg:col-span-8 bg-white dark:bg-[#1a191b] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+              <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center gap-2">
+                <Globe className="w-5 h-5 text-blue-500" />
+                Website Visitors & Blog Readership Trend
+              </h3>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Daily visitor traffic comparison: Total site visitors vs users reading blog posts (Last 7 days)
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                <span className="w-2 h-2 rounded-full bg-blue-500" />
+                Site Visitors: {visitorTrend.reduce((sum, v) => sum + (v.websiteVisitors || 0), 0)}
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                Blog Reads: {visitorTrend.reduce((sum, v) => sum + (v.blogVisitors || 0), 0)}
+              </span>
+            </div>
+          </div>
+
+          <div className="h-72 w-full pt-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={visitorTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="visitorGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.0} />
+                  </linearGradient>
+                  <linearGradient id="blogReadGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#F59E0B" stopOpacity={0.0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#88888820" />
+                <XAxis dataKey="day" stroke="#888888" fontSize={11} />
+                <YAxis
+                  stroke="#888888"
+                  fontSize={11}
+                  allowDecimals={false}
+                />
+                <Tooltip content={<CustomVisitorTooltip />} />
+                <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "8px" }} />
+                <Area
+                  type="monotone"
+                  dataKey="websiteVisitors"
+                  name="Website Visitors"
+                  stroke="#3B82F6"
+                  strokeWidth={2.5}
+                  fillOpacity={1}
+                  fill="url(#visitorGrad)"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="blogVisitors"
+                  name="Blog Readers"
+                  stroke="#F59E0B"
+                  strokeWidth={2.5}
+                  fillOpacity={1}
+                  fill="url(#blogReadGrad)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Right: Top Viewed / Trending Blogs */}
+        <div className="lg:col-span-4 bg-white dark:bg-[#1a191b] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center pb-3 border-b dark:border-gray-800">
+              <div className="flex items-center gap-2">
+                <Flame className="w-5 h-5 text-orange-500" />
+                <div>
+                  <h3 className="font-bold text-sm text-gray-900 dark:text-white">
+                    Most Read Blogs
+                  </h3>
+                  <p className="text-[11px] text-gray-500">
+                    Highest reader engagement articles
+                  </p>
+                </div>
+              </div>
+              <Link
+                to="/blog-management"
+                className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+              >
+                All Blogs <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="divide-y divide-gray-100 dark:divide-gray-800/80 mt-2">
+              {topViewedBlogs.length === 0 ? (
+                <div className="py-8 text-center text-xs text-gray-400 space-y-2">
+                  <BookOpen className="w-8 h-8 mx-auto text-gray-300 dark:text-gray-600" />
+                  <p>No blog reader activity recorded yet.</p>
+                </div>
+              ) : (
+                topViewedBlogs.map((blog, idx) => (
+                  <div key={blog.id || idx} className="py-2.5 flex items-center justify-between gap-3 group">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className={`w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 ${
+                        idx === 0
+                          ? "bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700"
+                          : idx === 1
+                          ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                          : "bg-gray-50 dark:bg-gray-800 text-gray-500"
+                      }`}>
+                        #{idx + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <a
+                          href={`https://creatibuzstudio.com/blogs/${blog.slug}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs font-semibold text-gray-900 dark:text-gray-100 hover:text-primary transition-colors truncate block group-hover:underline"
+                          title={blog.title}
+                        >
+                          {blog.title}
+                        </a>
+                        <span className="text-[10px] text-gray-400 block truncate">
+                          /{blog.slug}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs font-bold font-mono text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/50 px-2 py-0.5 rounded-md shrink-0">
+                      <Eye className="w-3 h-3" />
+                      {Number(blog.views || 0).toLocaleString()}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className="pt-3 border-t dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">
+            <span>Total Blog Readers:</span>
+            <span className="font-mono font-bold text-gray-900 dark:text-white">
+              {totalBlogReaders.toLocaleString()} reads
+            </span>
           </div>
         </div>
       </div>
