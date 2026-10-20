@@ -73,6 +73,18 @@ export const adminNavLinks = [
     link: "/packages",
     icon: DollarSign,
     allowedRoles: ["ceo", "coo", "hr"],
+    children: [
+      {
+        title: "All Packages",
+        link: "/packages",
+        allowedRoles: ["ceo", "coo", "hr"],
+      },
+      {
+        title: "Package Bookings",
+        link: "/package-bookings",
+        allowedRoles: ["ceo", "coo", "hr"],
+      },
+    ],
   },
   {
     id: 17,
