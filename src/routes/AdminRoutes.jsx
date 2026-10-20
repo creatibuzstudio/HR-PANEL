@@ -74,15 +74,15 @@ export const adminRoutes = [
       },
       {
         path: "packages",
-        element: withAdminRoute(PackageManagement, [], ["ceo", "coo", "hr"]),
+        element: withAdminRoute(PackageManagement, [], ["ceo", "coo", "hr", "admin", "founder", "cto", "super-admin"]),
       },
       {
         path: "package-bookings",
-        element: withAdminRoute(PackageBookingManagement, [], ["ceo", "coo", "hr"]),
+        element: withAdminRoute(PackageBookingManagement, [], ["ceo", "coo", "hr", "admin", "founder", "cto", "super-admin"]),
       },
       {
         path: "packages/bookings",
-        element: withAdminRoute(PackageBookingManagement, [], ["ceo", "coo", "hr"]),
+        element: withAdminRoute(PackageBookingManagement, [], ["ceo", "coo", "hr", "admin", "founder", "cto", "super-admin"]),
       },
       {
         path: "blogs",

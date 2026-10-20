@@ -21,6 +21,7 @@ import {
   Receipt,
   History,
   Clock,
+  PackageCheck,
 } from "lucide-react";
 import { Permissions } from "@/constants/permissions";
 
@@ -72,19 +73,14 @@ export const adminNavLinks = [
     title: "Packages",
     link: "/packages",
     icon: DollarSign,
-    allowedRoles: ["ceo", "coo", "hr"],
-    children: [
-      {
-        title: "All Packages",
-        link: "/packages",
-        allowedRoles: ["ceo", "coo", "hr"],
-      },
-      {
-        title: "Package Bookings",
-        link: "/package-bookings",
-        allowedRoles: ["ceo", "coo", "hr"],
-      },
-    ],
+    allowedRoles: ["ceo", "coo", "hr", "admin", "founder", "cto", "super-admin"],
+  },
+  {
+    id: 25,
+    title: "Package Bookings",
+    link: "/package-bookings",
+    icon: PackageCheck,
+    allowedRoles: ["ceo", "coo", "hr", "admin", "founder", "cto", "super-admin"],
   },
   {
     id: 17,
