@@ -10,6 +10,7 @@ import RolePermissionManagement from "@/pages/role-permissions-management/RolePe
 import { Permissions } from "@/constants/permissions";
 import PackageManagement from "@/pages/package-management/PackageManagement";
 import PackageBookingManagement from "@/pages/package-booking-management/PackageBookingManagement.jsx";
+import ContactManagement from "@/pages/contact-management/ContactManagement.jsx";
 import InvoiceManagement from "@/pages/invoice-management/InvoiceManagement.jsx";
 import ProductManagement from "@/pages/product-management/ProductManagement.jsx";
 import CustomerManagement from "@/pages/customer-management/CustomerManagement.jsx";
@@ -83,6 +84,14 @@ export const adminRoutes = [
       {
         path: "packages/bookings",
         element: withAdminRoute(PackageBookingManagement, [], ["ceo", "coo", "hr", "admin", "founder", "cto", "super-admin"]),
+      },
+      {
+        path: "contacts",
+        element: withAdminRoute(ContactManagement, [], ["ceo", "coo", "hr", "admin", "founder", "cto", "super-admin"]),
+      },
+      {
+        path: "contact-inquiries",
+        element: withAdminRoute(ContactManagement, [], ["ceo", "coo", "hr", "admin", "founder", "cto", "super-admin"]),
       },
       {
         path: "blogs",

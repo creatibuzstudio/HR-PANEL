@@ -22,6 +22,7 @@ import {
   History,
   Clock,
   PackageCheck,
+  Mail,
 } from "lucide-react";
 import { Permissions } from "@/constants/permissions";
 
@@ -80,6 +81,13 @@ export const adminNavLinks = [
     title: "Package Bookings",
     link: "/package-bookings",
     icon: PackageCheck,
+    allowedRoles: ["ceo", "coo", "hr", "admin", "founder", "cto", "super-admin"],
+  },
+  {
+    id: 26,
+    title: "Contact Inquiries",
+    link: "/contacts",
+    icon: Mail,
     allowedRoles: ["ceo", "coo", "hr", "admin", "founder", "cto", "super-admin"],
   },
   {
