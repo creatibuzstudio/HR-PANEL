@@ -12,8 +12,11 @@ const baseQuery = fetchBaseQuery({
     if (accessToken) {
       headers.set("Authorization", `Bearer ${accessToken}`);
     }
+    headers.set("Cache-Control", "no-cache");
+    headers.set("Pragma", "no-cache");
     return headers;
   },
+  fetchFn: (input, init) => fetch(input, { ...init, cache: "no-store" }),
 });
 
 // const baseQueryWithReauth = async (args, api, extraOptions) => {
