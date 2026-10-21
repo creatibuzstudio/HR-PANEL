@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useGetDashboardStatsQuery } from "@/services/stats/statsApiSlice";
+import {
+  useGetDashboardStatsQuery,
+  useUpdateAboutStatsMutation,
+} from "@/services/stats/statsApiSlice";
 import useAuth from "@/hooks/useAuth";
 import {
   DollarSign,
@@ -35,6 +38,9 @@ import {
   BookOpen,
   Flame,
   ExternalLink,
+  Edit,
+  X,
+  Save,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import {
@@ -75,6 +81,48 @@ export default function Dashboard() {
     user?.role?.toLowerCase() === "coo" ||
     user?.type?.toLowerCase() === "ceo" ||
     user?.type?.toLowerCase() === "coo";
+
+  const canManageAboutStats =
+    isExecutive ||
+    user?.role?.toLowerCase() === "admin" ||
+    user?.role?.toLowerCase() === "ceo" ||
+    user?.role?.toLowerCase() === "coo";
+
+  const [isAboutStatsModalOpen, setIsAboutStatsModalOpen] = useState(false);
+  const [updateAboutStats, { isLoading: isUpdatingAboutStats }] = useUpdateAboutStatsMutation();
+  const [aboutForm, setAboutForm] = useState({
+    projectDeliveries: 400,
+    inHouseExperts: 15,
+    satisfiedClients: 99,
+    businessPartners: 40,
+  });
+
+  const handleOpenAboutStatsModal = () => {
+    setAboutForm({
+      projectDeliveries: statsData?.aboutStats?.projectDeliveries ?? statsData?.projectDeliveries ?? 400,
+      inHouseExperts: statsData?.aboutStats?.inHouseExperts ?? statsData?.inHouseExperts ?? 15,
+      satisfiedClients: statsData?.aboutStats?.satisfiedClients ?? statsData?.satisfiedClients ?? 99,
+      businessPartners: statsData?.aboutStats?.businessPartners ?? statsData?.businessPartners ?? 40,
+    });
+    setIsAboutStatsModalOpen(true);
+  };
+
+  const handleSaveAboutStats = async (e) => {
+    e.preventDefault();
+    try {
+      await updateAboutStats({
+        projectDeliveries: Number(aboutForm.projectDeliveries),
+        inHouseExperts: Number(aboutForm.inHouseExperts),
+        satisfiedClients: Number(aboutForm.satisfiedClients),
+        businessPartners: Number(aboutForm.businessPartners),
+      }).unwrap();
+      toast.success("Landing Page [ About Us ] stats updated successfully!");
+      setIsAboutStatsModalOpen(false);
+      refetch();
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to update About Us stats");
+    }
+  };
 
   const totalRevenue = Number(overview.totalRevenue || 0);
   const totalInvoiced = Number(overview.totalInvoiced || 0);
@@ -586,6 +634,68 @@ export default function Dashboard() {
             >
               Read Live <ExternalLink className="w-3 h-3" />
             </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Landing Page [ About Us ] Dynamic Stats Card */}
+      <div className="p-5 rounded-2xl bg-white dark:bg-[#1a191b] border border-gray-200 dark:border-gray-800 shadow-sm relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-gray-100 dark:border-gray-800">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-primary uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" /> Landing Page [ About Us ] Dynamic Stats
+              </span>
+              <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 font-medium border border-emerald-200 dark:border-emerald-800">
+                Live on creatibuzstudio.com
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 mt-0.5">
+              These live metrics dynamically feed the landing page About Us section count-up counters.
+            </p>
+          </div>
+          {canManageAboutStats && (
+            <button
+              type="button"
+              onClick={handleOpenAboutStatsModal}
+              className="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-primary hover:bg-orange-600 active:scale-95 text-white shadow-sm flex items-center gap-1.5 transition-all"
+            >
+              <Edit className="w-3.5 h-3.5" /> Edit About Stats
+            </button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
+          <div className="p-4 rounded-xl bg-gray-50/70 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800/80">
+            <span className="text-[11px] text-gray-500 font-medium block">Project Deliveries</span>
+            <span className="text-2xl font-bold font-mono text-gray-900 dark:text-white mt-1 block">
+              {(statsData?.aboutStats?.projectDeliveries ?? statsData?.projectDeliveries ?? 400)}+
+            </span>
+            <span className="text-[10px] text-gray-400 mt-1 block">Showcased completions</span>
+          </div>
+
+          <div className="p-4 rounded-xl bg-gray-50/70 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800/80">
+            <span className="text-[11px] text-gray-500 font-medium block">In-House Experts</span>
+            <span className="text-2xl font-bold font-mono text-gray-900 dark:text-white mt-1 block">
+              {(statsData?.aboutStats?.inHouseExperts ?? statsData?.inHouseExperts ?? 15)}+
+            </span>
+            <span className="text-[10px] text-gray-400 mt-1 block">Dedicated specialists</span>
+          </div>
+
+          <div className="p-4 rounded-xl bg-gray-50/70 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800/80">
+            <span className="text-[11px] text-gray-500 font-medium block">Satisfied Clients</span>
+            <span className="text-2xl font-bold font-mono text-gray-900 dark:text-white mt-1 block">
+              {(statsData?.aboutStats?.satisfiedClients ?? statsData?.satisfiedClients ?? 99)}%
+            </span>
+            <span className="text-[10px] text-gray-400 mt-1 block">Client retention rate</span>
+          </div>
+
+          <div className="p-4 rounded-xl bg-gray-50/70 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-800/80">
+            <span className="text-[11px] text-gray-500 font-medium block">Business Partner</span>
+            <span className="text-2xl font-bold font-mono text-gray-900 dark:text-white mt-1 block">
+              {(statsData?.aboutStats?.businessPartners ?? statsData?.businessPartners ?? 40)}+
+            </span>
+            <span className="text-[10px] text-gray-400 mt-1 block">Active strategic alliances</span>
           </div>
         </div>
       </div>
@@ -1348,6 +1458,108 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Modal for Editing About Stats */}
+      {isAboutStatsModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#1a191b] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl max-w-md w-full overflow-hidden p-6 space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-gray-100 dark:border-gray-800">
+              <div>
+                <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" /> Edit [ About Us ] Stats
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Update the 4 dynamic numbers displayed on the landing page
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAboutStatsModalOpen(false)}
+                className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveAboutStats} className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1">
+                  Project Deliveries (e.g. 400+)
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  value={aboutForm.projectDeliveries}
+                  onChange={(e) => setAboutForm({ ...aboutForm, projectDeliveries: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1">
+                  In-House Experts (e.g. 15+)
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  value={aboutForm.inHouseExperts}
+                  onChange={(e) => setAboutForm({ ...aboutForm, inHouseExperts: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1">
+                  Satisfied Clients (e.g. 99%)
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  max="100"
+                  value={aboutForm.satisfiedClients}
+                  onChange={(e) => setAboutForm({ ...aboutForm, satisfiedClients: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 block mb-1">
+                  Business Partner (e.g. 40+)
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  value={aboutForm.businessPartners}
+                  onChange={(e) => setAboutForm({ ...aboutForm, businessPartners: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                />
+              </div>
+
+              <div className="flex justify-end items-center gap-2.5 pt-3 border-t border-gray-100 dark:border-gray-800">
+                <button
+                  type="button"
+                  onClick={() => setIsAboutStatsModalOpen(false)}
+                  className="px-4 py-2 text-xs font-semibold rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdatingAboutStats}
+                  className="px-4 py-2 text-xs font-bold rounded-xl bg-primary hover:bg-orange-600 text-white shadow-sm flex items-center gap-1.5 transition-all disabled:opacity-50"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  {isUpdatingAboutStats ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

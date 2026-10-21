@@ -7,7 +7,24 @@ export const statsApiSlice = apiSlice.injectEndpoints({
       transformResponse: (response) => response?.data || response,
       providesTags: ["Stats", "Order", "Finance", "users"],
     }),
+    getAboutStats: builder.query({
+      query: () => "/stats/about",
+      transformResponse: (response) => response?.data || response,
+      providesTags: ["Stats", "AboutStats"],
+    }),
+    updateAboutStats: builder.mutation({
+      query: (data) => ({
+        url: "/stats/about",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["Stats", "AboutStats"],
+    }),
   }),
 });
 
-export const { useGetDashboardStatsQuery } = statsApiSlice;
+export const {
+  useGetDashboardStatsQuery,
+  useGetAboutStatsQuery,
+  useUpdateAboutStatsMutation,
+} = statsApiSlice;
