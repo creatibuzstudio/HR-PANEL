@@ -11,7 +11,7 @@ import {
   useUpdateBookingMutation,
 } from "@/services/package-booking/packageBookingApiSlice.js";
 import { useGetAllPackagesQuery } from "@/services/package/packageApiSlice.js";
-import { User, Mail, Building, Briefcase, Calendar, CheckCircle2 } from "lucide-react";
+import { User, Mail, Building, Briefcase, Calendar, CheckCircle2, Phone } from "lucide-react";
 
 // Validation schema
 const schema = yup.object({
@@ -21,6 +21,7 @@ const schema = yup.object({
     .trim()
     .email("Must be a valid email address")
     .required("Client email is required"),
+  whatsappNumber: yup.string().trim().nullable(),
   companyName: yup.string().trim().required("Company name is required"),
   companyEmail: yup
     .string()
@@ -74,6 +75,7 @@ const PackageBookingForm = ({ bookingData = null, onSuccess, onCancel }) => {
     defaultValues: {
       name: "",
       userEmail: "",
+      whatsappNumber: "",
       companyName: "",
       companyEmail: "",
       packageId: "",
@@ -90,6 +92,7 @@ const PackageBookingForm = ({ bookingData = null, onSuccess, onCancel }) => {
       reset({
         name: bookingData.name || "",
         userEmail: bookingData.userEmail || "",
+        whatsappNumber: bookingData.whatsappNumber || "",
         companyName: bookingData.companyName || "",
         companyEmail: bookingData.companyEmail || "",
         packageId: bookingData.packageId || bookingData.package?.id || "",
@@ -100,6 +103,7 @@ const PackageBookingForm = ({ bookingData = null, onSuccess, onCancel }) => {
       reset({
         name: "",
         userEmail: "",
+        whatsappNumber: "",
         companyName: "",
         companyEmail: "",
         packageId: packages[0]?.id || "",
@@ -114,6 +118,7 @@ const PackageBookingForm = ({ bookingData = null, onSuccess, onCancel }) => {
       const payload = {
         name: formData.name.trim(),
         userEmail: formData.userEmail.trim(),
+        whatsappNumber: formData.whatsappNumber ? formData.whatsappNumber.trim() : null,
         companyName: formData.companyName.trim(),
         companyEmail: formData.companyEmail.trim(),
         packageId: formData.packageId,
@@ -161,7 +166,7 @@ const PackageBookingForm = ({ bookingData = null, onSuccess, onCancel }) => {
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <TextField
             label="Client Full Name *"
             type="text"
@@ -182,6 +187,16 @@ const PackageBookingForm = ({ bookingData = null, onSuccess, onCancel }) => {
             error={errors.userEmail?.message}
             required
             icon={<Mail className="w-4 h-4 text-gray-400" />}
+          />
+
+          <TextField
+            label="WhatsApp Number (Optional)"
+            type="text"
+            placeholder="e.g. +880 1968 657353"
+            register={register}
+            name="whatsappNumber"
+            error={errors.whatsappNumber?.message}
+            icon={<Phone className="w-4 h-4 text-emerald-500" />}
           />
         </div>
       </div>

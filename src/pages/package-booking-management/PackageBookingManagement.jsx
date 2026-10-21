@@ -4,6 +4,7 @@ import PrimaryButton from "@/components/ui/buttons/primary-button";
 import IconButton from "@/components/ui/buttons/icon-button";
 import PackageBookingForm from "@/components/package-booking/PackageBookingForm";
 import PackageBookingDetailsModal from "@/components/package-booking/PackageBookingDetailsModal";
+import BookingReplyEmailModal from "@/components/package-booking/BookingReplyEmailModal";
 import Modal from "@/components/ui/modal.jsx";
 import DeleteConfirmModal from "@/components/ui/modal/DeleteConfirmModal.jsx";
 import { Card } from "@/components/ui/card";
@@ -12,6 +13,8 @@ import {
   Edit,
   Trash2,
   Eye,
+  Mail,
+  Phone,
   Briefcase,
   Clock,
   CheckCircle2,
@@ -56,6 +59,12 @@ export default function PackageBookingManagement() {
   const [detailsModalState, setDetailsModalState] = useState({
     isOpen: false,
     data: null,
+  });
+
+  // Reply Email Modal state
+  const [replyModalState, setReplyModalState] = useState({
+    isOpen: false,
+    booking: null,
   });
 
   // Delete Confirm Modal state
@@ -176,6 +185,12 @@ export default function PackageBookingManagement() {
             <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               {booking.userEmail || "—"}
             </div>
+            {booking.whatsappNumber && (
+              <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1 mt-1">
+                <Phone className="w-3 h-3 text-emerald-500 flex-shrink-0" />
+                <span>{booking.whatsappNumber}</span>
+              </div>
+            )}
           </div>
         </div>
       ),
@@ -229,6 +244,12 @@ export default function PackageBookingManagement() {
             title="View Booking Details"
           />
           <IconButton
+            icon={Mail}
+            onClick={() => handleReply(booking)}
+            className="text-amber-600 hover:text-amber-700"
+            title="Send Email Reply to Client"
+          />
+          <IconButton
             icon={Edit}
             onClick={() => handleEdit(booking)}
             className="text-emerald-600 hover:text-emerald-700"
@@ -253,6 +274,14 @@ export default function PackageBookingManagement() {
       package: booking.package || packagesMap[booking.packageId],
     };
     setDetailsModalState({ isOpen: true, data: resolvedBooking });
+  };
+
+  const handleReply = (booking) => {
+    const resolvedBooking = {
+      ...booking,
+      package: booking.package || packagesMap[booking.packageId],
+    };
+    setReplyModalState({ isOpen: true, booking: resolvedBooking });
   };
 
   const handleEdit = (booking) => {
@@ -454,9 +483,20 @@ export default function PackageBookingManagement() {
         isOpen={detailsModalState.isOpen}
         onClose={() => setDetailsModalState({ isOpen: false, data: null })}
         booking={detailsModalState.data}
+        onReply={(booking) => handleReply(booking)}
         onEdit={(booking) => {
           setDetailsModalState({ isOpen: false, data: null });
           setModalState({ isOpen: true, type: "edit", data: booking });
+        }}
+      />
+
+      {/* Client Reply Email Modal */}
+      <BookingReplyEmailModal
+        isOpen={replyModalState.isOpen}
+        onClose={() => setReplyModalState({ isOpen: false, booking: null })}
+        booking={replyModalState.booking}
+        onSuccess={() => {
+          refetch();
         }}
       />
 

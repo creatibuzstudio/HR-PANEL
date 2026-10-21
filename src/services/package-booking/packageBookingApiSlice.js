@@ -35,6 +35,7 @@ export const packageBookingApiSlice = apiSlice.injectEndpoints({
             (b) =>
               b.name?.toLowerCase().includes(query) ||
               b.userEmail?.toLowerCase().includes(query) ||
+              b.whatsappNumber?.toLowerCase().includes(query) ||
               b.companyName?.toLowerCase().includes(query) ||
               b.companyEmail?.toLowerCase().includes(query) ||
               b.billingCycle?.toLowerCase().includes(query) ||
@@ -94,6 +95,15 @@ export const packageBookingApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: ["PackageBooking"],
     }),
 
+    sendBookingReplyEmail: builder.mutation({
+      query: (data) => ({
+        url: "/package-booking/send-reply",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["PackageBooking"],
+    }),
+
     deleteBooking: builder.mutation({
       query: (id) => ({
         url: `/package-booking/${id}`,
@@ -110,5 +120,6 @@ export const {
   useGetBookingByIdQuery,
   useCreateBookingMutation,
   useUpdateBookingMutation,
+  useSendBookingReplyEmailMutation,
   useDeleteBookingMutation,
 } = packageBookingApiSlice;

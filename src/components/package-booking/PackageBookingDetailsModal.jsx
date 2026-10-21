@@ -16,6 +16,9 @@ import {
   Tag,
   ShieldCheck,
   Layers,
+  Phone,
+  Send,
+  ExternalLink,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useUpdateBookingMutation } from "@/services/package-booking/packageBookingApiSlice";
@@ -42,6 +45,7 @@ const PackageBookingDetailsModal = ({
   onClose,
   booking,
   onEdit,
+  onReply,
 }) => {
   const [copiedId, setCopiedId] = useState(false);
   const [updateBooking, { isLoading: isUpdatingStatus }] = useUpdateBookingMutation();
@@ -181,6 +185,20 @@ const PackageBookingDetailsModal = ({
                   <Mail className="w-3.5 h-3.5 text-gray-400" />
                   <span>{booking.userEmail || "N/A"}</span>
                 </div>
+                {booking.whatsappNumber && (
+                  <div className="text-xs flex items-center gap-1.5 mt-1">
+                    <Phone className="w-3.5 h-3.5 text-emerald-500" />
+                    <a
+                      href={`https://wa.me/${booking.whatsappNumber.replace(/[^0-9]/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-emerald-600 dark:text-emerald-400 font-medium hover:underline flex items-center gap-1"
+                    >
+                      {booking.whatsappNumber}
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -292,6 +310,17 @@ const PackageBookingDetailsModal = ({
               onClick={onClose}
             >
               Close
+            </PrimaryButton>
+            <PrimaryButton
+              type="button"
+              onClick={() => {
+                onClose();
+                onReply?.(booking);
+              }}
+              className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              <Send className="w-3.5 h-3.5" />
+              Reply via Email
             </PrimaryButton>
             <PrimaryButton
               type="button"
