@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 // import { userLoggedIn, userLoggedOut } from "@/services/auth/authSlice";
 import { getTokens } from "@/hooks/useToken";
 
-const BASE_URL = "https://api.creatibuzstudio.com";
+const BASE_URL = import.meta.env.VITE_API_URL || "https://api.creatibuzstudio.com";
 
 
 const baseQuery = fetchBaseQuery({
