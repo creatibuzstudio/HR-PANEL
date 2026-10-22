@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
+import moment from "moment";
 import {
   useGetDashboardStatsQuery,
   useUpdateAboutStatsMutation,
 } from "@/services/stats/statsApiSlice";
+import { useGetUserWithSearchQuery } from "@/services/user/userApiSlice";
 import useAuth from "@/hooks/useAuth";
+import TodayBirthdayBanner from "@/components/birthday/TodayBirthdayBanner";
+import BirthdayPosterModal from "@/components/birthday/BirthdayPosterModal";
 import {
   DollarSign,
   TrendingUp,
@@ -33,6 +37,8 @@ import {
   UserPlus,
   Calendar,
   Share2,
+  Download,
+  Palette,
   Eye,
   Globe,
   BookOpen,
@@ -72,6 +78,93 @@ export default function Dashboard() {
   const newJoiners = statsData?.newJoiners || [];
   const runningMonthName = statsData?.runningMonthName || "This Month";
 
+  // All active system users for Birthday detection & poster studio
+  const { data: usersData } = useGetUserWithSearchQuery({ page: 1, limit: 100 });
+
+  // Birthday Studio & Today's Celebration State
+  const [isPosterModalOpen, setIsPosterModalOpen] = useState(false);
+  const [selectedPosterEmployee, setSelectedPosterEmployee] = useState(null);
+  const [isPreviewBirthdayActive, setIsPreviewBirthdayActive] = useState(false);
+
+  // Combine and deduplicate users for the Birthday Poster Studio
+  const allAvailableEmployees = useMemo(() => {
+    const list = [];
+    const seen = new Set();
+
+    // 1. From upcomingBirthdays
+    (upcomingBirthdays || []).forEach((b) => {
+      const id = b.id || b._id || b.name;
+      if (!seen.has(id)) {
+        seen.add(id);
+        list.push({
+          id,
+          name: b.name,
+          designation: b.designation,
+          department: b.department,
+          picture: b.picture,
+          isToday: Boolean(b.isToday || b.daysRemaining === 0),
+          formattedDate: b.formattedDate,
+        });
+      }
+    });
+
+    // 2. From all active registered users in system
+    (usersData?.items || []).forEach((u) => {
+      const id = u._id || u.id;
+      if (!seen.has(id) && u.role?.toLowerCase() !== "client") {
+        seen.add(id);
+        const isBdayToday = u.dateOfBirth
+          ? moment(u.dateOfBirth).format("MM-DD") === moment().format("MM-DD")
+          : false;
+        list.push({
+          id,
+          name: u.name,
+          designation: u.designation?.title || u.role || "Team Member",
+          department: u.department?.name || "Creatibuz Studio",
+          picture: u.picture || u.profilePicture,
+          dateOfBirth: u.dateOfBirth,
+          isToday: isBdayToday,
+          formattedDate: u.dateOfBirth ? moment(u.dateOfBirth).format("MMM DD") : null,
+        });
+      }
+    });
+
+    // Fallback demo employee if empty
+    if (list.length === 0) {
+      list.push({
+        id: "sample-vipul",
+        name: "Mr. Vipul Birja",
+        designation: "Director",
+        department: "Creatibuz Studio",
+        picture: "",
+        isToday: true,
+        formattedDate: moment().format("MMM DD"),
+      });
+    }
+
+    return list;
+  }, [upcomingBirthdays, usersData]);
+
+  // Determine employees celebrating their birthday TODAY
+  const effectiveTodayBirthdays = useMemo(() => {
+    const list = allAvailableEmployees.filter((e) => e.isToday);
+    if (list.length > 0) return list;
+    if (isPreviewBirthdayActive) {
+      return [allAvailableEmployees[0]];
+    }
+    return [];
+  }, [allAvailableEmployees, isPreviewBirthdayActive]);
+
+  const handleOpenPosterStudio = (emp = null) => {
+    const targetEmp =
+      emp ||
+      effectiveTodayBirthdays[0] ||
+      upcomingBirthdays[0] ||
+      allAvailableEmployees[0];
+    setSelectedPosterEmployee(targetEmp);
+    setIsPosterModalOpen(true);
+  };
+
   const revenueTrend = charts.revenueTrend || [];
   const orderStatusDistribution = charts.orderStatusDistribution || [];
   const profitDistribution = charts.profitDistribution || [];
@@ -87,6 +180,24 @@ export default function Dashboard() {
     user?.role?.toLowerCase() === "admin" ||
     user?.role?.toLowerCase() === "ceo" ||
     user?.role?.toLowerCase() === "coo";
+
+  const userRoleStr = (
+    typeof user?.role === "string"
+      ? user?.role
+      : user?.role?.name || user?.role?.title || user?.type || ""
+  )
+    .toLowerCase()
+    .trim();
+
+  const canDownloadBirthdayPoster =
+    userRoleStr === "ceo" ||
+    userRoleStr === "coo" ||
+    userRoleStr === "hr" ||
+    userRoleStr === "admin" ||
+    userRoleStr === "superadmin" ||
+    userRoleStr.includes("ceo") ||
+    userRoleStr.includes("coo") ||
+    userRoleStr.includes("hr");
 
   const [isAboutStatsModalOpen, setIsAboutStatsModalOpen] = useState(false);
   const [updateAboutStats, { isLoading: isUpdatingAboutStats }] = useUpdateAboutStatsMutation();
@@ -280,6 +391,16 @@ export default function Dashboard() {
         <div className="absolute -top-16 -right-16 w-72 h-72 bg-white/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-16 left-1/3 w-64 h-64 bg-amber-300/20 rounded-full blur-3xl pointer-events-none" />
       </div>
+
+      {/* Today's Birthday Celebration Showcase (Appears on employee's birthday) */}
+      {effectiveTodayBirthdays.length > 0 && (
+        <div className="animate-fade-in">
+          <TodayBirthdayBanner
+            todayBirthdays={effectiveTodayBirthdays}
+            onOpenStudio={handleOpenPosterStudio}
+          />
+        </div>
+      )}
 
       {/* Main Core Statistics Cards */}
       {isExecutive ? (
@@ -1028,13 +1149,38 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <Link
-                to="/user-management/all-users"
-                className="text-xs font-semibold text-pink-600 dark:text-pink-400 hover:underline flex items-center gap-1"
-                title="Manage employee birthdays"
-              >
-                Team List <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
+              <div className="flex items-center gap-2">
+                {canDownloadBirthdayPoster && (
+                  <button
+                    type="button"
+                    onClick={() => handleOpenPosterStudio()}
+                    className="text-xs font-bold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/60 hover:bg-orange-100 dark:hover:bg-orange-900/40 px-2.5 py-1 rounded-lg border border-orange-200 dark:border-orange-800/80 flex items-center gap-1.5 transition-colors shadow-2xs"
+                    title="Open Facebook Birthday Poster Studio"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-orange-500" />
+                    <span>Poster Studio</span>
+                  </button>
+                )}
+
+                {effectiveTodayBirthdays.length === 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setIsPreviewBirthdayActive((prev) => !prev)}
+                    className="text-[11px] font-semibold text-gray-500 hover:text-orange-600 dark:text-gray-400 dark:hover:text-orange-300 underline"
+                    title="Toggle demo view of today's birthday card"
+                  >
+                    {isPreviewBirthdayActive ? "Hide Card" : "Preview Card"}
+                  </button>
+                )}
+
+                <Link
+                  to="/user-management/all-users"
+                  className="text-xs font-semibold text-pink-600 dark:text-pink-400 hover:underline flex items-center gap-1"
+                  title="Manage employee birthdays"
+                >
+                  Team List <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
             </div>
 
             <div className="p-4 divide-y divide-gray-100 dark:divide-gray-800/80">
@@ -1095,26 +1241,39 @@ export default function Dashboard() {
 
                         </div>
                         <div className="text-xs text-gray-500 truncate">
-                          {item.designation} • {item.department}
+                          {item.designation}
                         </div>
                       </div>
                     </div>
 
-                    <div className="text-right flex-shrink-0">
+                    <div className="text-right flex-shrink-0 flex flex-col items-end gap-1">
                       <div className="text-xs font-mono font-bold text-gray-800 dark:text-gray-200 flex items-center justify-end gap-1">
                         <Calendar className="w-3 h-3 text-pink-500" />
                         {item.formattedDate}
                       </div>
-                      <span
-                        className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[11px] font-bold ${item.isToday
-                          ? "bg-pink-500 text-white animate-pulse shadow-sm"
-                          : item.daysRemaining === 1
-                            ? "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700"
-                            : "bg-pink-100 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300"
-                          }`}
-                      >
-                        {item.statusText}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-bold ${item.isToday
+                            ? "bg-pink-500 text-white animate-pulse shadow-sm"
+                            : item.daysRemaining === 1
+                              ? "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700"
+                              : "bg-pink-100 dark:bg-pink-950/60 text-pink-700 dark:text-pink-300"
+                            }`}
+                        >
+                          {item.statusText}
+                        </span>
+
+                        {canDownloadBirthdayPoster && (
+                          <button
+                            type="button"
+                            onClick={() => handleOpenPosterStudio(item)}
+                            className="px-2 py-0.5 rounded-lg text-[10px] font-bold border border-orange-200 dark:border-orange-800/80 bg-orange-50 dark:bg-orange-950/50 text-orange-600 dark:text-orange-400 hover:bg-orange-100 transition-colors flex items-center gap-1 shadow-2xs"
+                            title="Generate Facebook Birthday Poster (1080x1080)"
+                          >
+                            <Download className="w-3 h-3" /> Poster
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))
@@ -1560,6 +1719,13 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+      {/* Birthday Poster Studio Modal */}
+      <BirthdayPosterModal
+        isOpen={isPosterModalOpen}
+        onClose={() => setIsPosterModalOpen(false)}
+        initialEmployee={selectedPosterEmployee}
+        allEmployees={allAvailableEmployees}
+      />
     </div>
   );
 }
