@@ -16,6 +16,7 @@ import {
 // Validation schema
 const schema = yup.object({
   name: yup.string().required("Package name is required"),
+  title: yup.string().nullable().optional(),
   description: yup.string().required("Description is required"),
   price: yup
     .number()
@@ -74,6 +75,7 @@ const PackageForm = ({ packageData = null, onSuccess, onCancel }) => {
     resolver: yupResolver(schema),
     defaultValues: {
       name: "",
+      title: "",
       description: "",
       price: "",
       duration: "Monthly",
@@ -86,6 +88,7 @@ const PackageForm = ({ packageData = null, onSuccess, onCancel }) => {
     if (packageData) {
       reset({
         name: packageData.name || "",
+        title: packageData.title || "",
         description: packageData.description || "",
         price: packageData.price || "",
         duration: packageData.duration || "Monthly",
@@ -133,6 +136,7 @@ const PackageForm = ({ packageData = null, onSuccess, onCancel }) => {
 
       const payload = {
         name: data.name,
+        title: data.title ? data.title.trim() : null,
         description: data.description,
         price: Number(data.price),
         duration: data.duration,
@@ -188,6 +192,15 @@ const PackageForm = ({ packageData = null, onSuccess, onCancel }) => {
           name="name"
           error={errors.name?.message}
           required
+        />
+
+        <TextField
+          label="Title / Unit (e.g. Month, Project)"
+          type="text"
+          placeholder="e.g. Month, Project, Per Month"
+          register={register}
+          name="title"
+          error={errors.title?.message}
         />
 
         <TextField

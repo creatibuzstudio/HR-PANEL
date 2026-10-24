@@ -99,6 +99,7 @@ export default function PackageManagement() {
   const headers = [
     { header: "SL", field: "sl" },
     { header: "Package Name", field: "name" },
+    { header: "Title / Unit", field: "title" },
     { header: "Category", field: "category" },
     { header: "Price", field: "price" },
     { header: "Duration", field: "duration" },
@@ -117,6 +118,7 @@ export default function PackageManagement() {
           {packageData.name || "N/A"}
         </span>
       ),
+      title: packageData.title || "—",
       category: packageData.category?.name || "—",
       price: `$${packageData.price ?? 0}`,
       duration: packageData.duration || "N/A",

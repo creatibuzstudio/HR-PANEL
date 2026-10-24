@@ -14,8 +14,8 @@ export const packageApiSlice = apiSlice.injectEndpoints({
         let items = Array.isArray(response?.data)
           ? response.data
           : Array.isArray(response)
-          ? response
-          : response?.items || [];
+            ? response
+            : response?.items || [];
 
         const query = arg?.query?.toLowerCase()?.trim();
         if (query) {
@@ -64,8 +64,8 @@ export const packageApiSlice = apiSlice.injectEndpoints({
         let items = Array.isArray(response?.data)
           ? response.data
           : Array.isArray(response)
-          ? response
-          : response?.items || [];
+            ? response
+            : response?.items || [];
 
         const query = arg?.query?.toLowerCase()?.trim();
         if (query) {

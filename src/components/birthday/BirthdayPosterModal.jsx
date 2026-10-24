@@ -180,13 +180,13 @@ export default function BirthdayPosterModal({
             </div>
             <div>
               <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                Facebook Birthday Poster Studio
+                Official Birthday Poster Studio
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800">
-                  1080 x 1080 Square Post (1:1)
+                  Official Creatibuz Poster
                 </span>
               </h2>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Generate, customize, and export ready-to-post Facebook birthday cards matching our brand theme.
+                Official Creatibuz Studio birthday poster for social media and employee celebrations.
               </p>
             </div>
           </div>
@@ -207,7 +207,7 @@ export default function BirthdayPosterModal({
               <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center justify-between">
                 <span>Live Card Preview</span>
                 <span className="text-[11px] text-orange-600 dark:text-orange-400 font-mono">
-                  1080 × 1080 (1:1)
+                  Official Design
                 </span>
               </div>
 
@@ -232,7 +232,7 @@ export default function BirthdayPosterModal({
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-orange-600 hover:bg-orange-700 active:scale-95 text-white shadow-lg shadow-orange-500/20 transition-all disabled:opacity-50"
                   >
                     <Download className="w-4 h-4" />
-                    Download Facebook Post (1080x1080)
+                    Download Official Poster (PNG)
                   </button>
                 ) : (
                   <div className="flex-1 text-center py-2 px-3 rounded-xl bg-gray-100 dark:bg-zinc-800 text-[11px] text-gray-500 font-medium">

@@ -81,7 +81,7 @@ export default function PackageDetailsModal({
               <div className="text-3xl font-extrabold text-primary flex items-baseline sm:justify-end gap-1">
                 <span>${packageData.price ?? 0}</span>
                 <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                  /{packageData.duration || "One-Time"}
+                  /{packageData.title || packageData.duration || "One-Time"}
                 </span>
               </div>
             </div>
